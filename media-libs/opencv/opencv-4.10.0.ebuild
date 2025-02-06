@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -63,7 +63,7 @@ else
 			https://github.com/${PN}/${PN}_extra/archive/refs/tags/${PV}.tar.gz -> ${PN}_extra-${PV}.tar.gz
 		)
 	"
-	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
+	KEYWORDS="amd64 ~arm arm64 ~loong ~ppc ~ppc64 ~riscv x86"
 fi
 
 LICENSE="Apache-2.0"
@@ -381,7 +381,7 @@ cuda_get_host_compiler() {
 
 	ebegin "testing ${NVCC_CCBIN_default} (default)"
 
-	while ! nvcc - -x cu <<<"int main(){}" &>/dev/null; do
+	while ! nvcc -v -ccbin "${NVCC_CCBIN}" - -x cu <<<"int main(){}" &>> "${T}/cuda_get_host_compiler.log" ; do
 		eend 1
 
 		while true; do
@@ -565,8 +565,9 @@ multilib_src_configure() {
 	# bug #919101 and https://github.com/opencv/opencv/issues/19020
 	filter-lto
 
-	if tc-is-gcc && [[ $(gcc-major-version) -ge 15 ]] && use contribdnn; then
-		append-cxxflags "-fno-tree-vectorize"
+	# bug #948071 (gcc PR118464)
+	if tc-is-gcc && [[ $(gcc-major-version) -eq 15 ]]; then
+		append-cxxflags "-fno-tree-loop-optimize"
 	fi
 
 	# please don't sort here, order is the same as in CMakeLists.txt

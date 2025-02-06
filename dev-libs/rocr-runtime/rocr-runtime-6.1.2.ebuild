@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -24,6 +24,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-5.7.1-extend-isa-compatibility-check.patch"
 	"${FILESDIR}/${PN}-6.1.0-musl.patch"
 	"${FILESDIR}/${PN}-6.1.0-ld-lld.patch"
+	"${FILESDIR}/${PN}-6.1.2-gcc15-stdint.patch"
 )
 
 LICENSE="MIT"
@@ -33,11 +34,11 @@ IUSE="debug"
 COMMON_DEPEND="dev-libs/elfutils
 	x11-libs/libdrm"
 DEPEND="${COMMON_DEPEND}
-	>=dev-libs/roct-thunk-interface-${PV}
-	>=dev-libs/rocm-device-libs-${PV}
+	dev-libs/roct-thunk-interface:${SLOT}
+	dev-libs/rocm-device-libs:${SLOT}
 	$(llvm_gen_dep '
-		sys-devel/clang:${LLVM_SLOT}=
-		sys-devel/lld:${LLVM_SLOT}=
+		llvm-core/clang:${LLVM_SLOT}=
+		llvm-core/lld:${LLVM_SLOT}=
 	')
 "
 RDEPEND="${DEPEND}"

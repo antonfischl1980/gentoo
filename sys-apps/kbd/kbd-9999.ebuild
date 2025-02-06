@@ -27,11 +27,6 @@ SLOT="0"
 IUSE="nls selinux pam test"
 RESTRICT="!test? ( test )"
 
-# Testsuite's Makefile.am calls missing(!)
-# ... but this seems to be consistent with the autoconf docs?
-# Needs more investigation: https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/autom4te-Invocation.html
-QA_AM_MAINTAINER_MODE=".*--run autom4te --language=autotest.*"
-
 DEPEND="
 	app-alternatives/gzip
 	pam? (
@@ -83,9 +78,6 @@ src_test() {
 
 src_install() {
 	default
-
-	docinto html
-	dodoc docs/doc/*.html
 
 	# USE="test" installs .la files
 	find "${ED}" -type f -name "*.la" -delete || die

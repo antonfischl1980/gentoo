@@ -12,7 +12,7 @@ DESCRIPTION="Library for rendering dynamic web content in Qt5 C++ and QML applic
 HOMEPAGE="https://www.qt.io/"
 
 if [[ ${QT5_BUILD_TYPE} == release ]]; then
-	KEYWORDS="~amd64 ~arm64"
+	KEYWORDS="amd64 arm64"
 	if [[ ${PV} == ${QT5_PV}_p* ]]; then
 		SRC_URI="https://dev.gentoo.org/~asturm/distfiles/${P}.tar.xz"
 		S="${WORKDIR}/${P}"
@@ -199,7 +199,7 @@ src_prepare() {
 
 	# src/3rdparty/gn fails with libc++ due to passing of `-static-libstdc++`
 	if tc-is-clang ; then
-		if has_version 'sys-devel/clang[default-libcxx(-)]' || has_version 'sys-devel/clang-common[default-libcxx(-)]' ; then
+		if has_version 'llvm-core/clang[default-libcxx(-)]' || has_version 'llvm-core/clang-common[default-libcxx(-)]' ; then
 			eapply "${FILESDIR}/${PN}-5.15.2_p20210521-clang-libc++.patch"
 		fi
 	fi

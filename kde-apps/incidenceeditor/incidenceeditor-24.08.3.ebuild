@@ -14,7 +14,7 @@ DESCRIPTION="Incidence editor for KOrganizer"
 
 LICENSE="GPL-2+"
 SLOT="6"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="amd64 arm64"
 IUSE=""
 
 RDEPEND="
@@ -50,7 +50,7 @@ RDEPEND="
 	>=kde-frameworks/kxmlgui-${KFMIN}:6
 "
 DEPEND="${RDEPEND}
-	test? ( >=kde-apps/akonadi-${PVCUT}:6[mysql,postgres,sqlite] )
+	test? ( =kde-apps/akonadi-${PVCUT}*:6[mysql,postgres,sqlite] )
 "
 BDEPEND="
 	test? ( >=kde-apps/akonadi-${PVCUT}:6[tools] )

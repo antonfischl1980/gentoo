@@ -1,14 +1,14 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-inherit autotools elisp-common flag-o-matic readme.gentoo-r1
+inherit autotools eapi9-pipestatus elisp-common flag-o-matic readme.gentoo-r1
 
 DESCRIPTION="The extensible, customizable, self-documenting real-time display editor"
 HOMEPAGE="https://www.gnu.org/software/emacs/"
 SRC_URI="mirror://gnu/emacs/${P}.tar.xz
-	https://dev.gentoo.org/~ulm/emacs/${P}-patches-10.tar.xz"
+	https://dev.gentoo.org/~ulm/emacs/${P}-patches-11.tar.xz"
 # FULL_VERSION keeps the full version number, which is needed in
 # order to determine some path information correctly for copy/move
 # operations later on
@@ -105,7 +105,7 @@ SITEFILE="20${EMACS_SUFFIX}-gentoo.el"
 PATCHES=("${WORKDIR}/patch")
 
 # Suppress false positive QA warnings #898304
-QA_CONFIG_IMPL_DECL_SKIP=( malloc_{set,get}_state MIN )
+QA_CONFIG_IMPL_DECL_SKIP=( malloc_{get,set}_state )
 
 src_prepare() {
 	default
@@ -284,14 +284,14 @@ src_install() {
 			-e "/^ExecStart/s,emacs,${EPREFIX}/usr/bin/${EMACS_SUFFIX}," \
 			-e "/^ExecStop/s,emacsclient,${EPREFIX}/usr/bin/&-${EMACS_SUFFIX}," \
 			etc/emacs.service | newins - ${EMACS_SUFFIX}.service
-		assert
+		pipestatus || die
 	fi
 
 	if use gzip-el; then
 		# compress .el files when a corresponding .elc exists
 		find "${ED}"/usr/share/emacs/${FULL_VERSION}/lisp -type f \
 			-name "*.elc" -print | sed 's/\.elc$/.el/' | xargs gzip -9n
-		assert "gzip .el failed"
+		pipestatus || die "gzip .el pipeline failed"
 	fi
 
 	local cdir
@@ -321,7 +321,7 @@ src_install() {
 	X	   (while (and (cdr q) (not (string-match re (cadr q))))
 	X	     (setq q (cdr q)))
 	X	   (setcdr q (cons dir (delete dir (cdr q))))
-	X	   (setenv "INFOPATH" (mapconcat 'identity (cdr p) ":"))))))
+	X	   (setenv "INFOPATH" (mapconcat #'identity (cdr p) ":"))))))
 	EOF
 	elisp-site-file-install "${T}/${SITEFILE}" || die
 
@@ -365,16 +365,13 @@ pkg_postinst() {
 	elisp-site-regen
 	readme.gentoo_print_elog
 
-	if use livecd; then
-		# force an update of the emacs symlink for the livecd/dvd,
-		# because some microemacs packages set it with USE=livecd
-		eselect emacs update
-	else
-		eselect emacs update ifunset
-	fi
+	# Force an update of the emacs symlink for the livecd/dvd,
+	# because some microemacs packages set it with USE=livecd.
+	# Otherwise, create it only when it is not yet set.
+	eselect --root="${ROOT}" emacs update $(usev !livecd ifunset)
 }
 
 pkg_postrm() {
 	elisp-site-regen
-	eselect emacs update ifunset
+	eselect --root="${ROOT}" emacs update ifunset
 }

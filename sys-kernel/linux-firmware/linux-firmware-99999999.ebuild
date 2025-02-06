@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -72,13 +72,16 @@ IDEPEND="
 "
 
 QA_PREBUILT="*"
+PATCHES=(
+	"${FILESDIR}"/${PN}-copy-firmware-r8.patch
+)
 
 pkg_pretend() {
 	if use initramfs; then
 		if use dist-kernel; then
 			# Check, but don't die because we can fix the problem and then
 			# emerge --config ... to re-run installation.
-			[[ -z ${ROOT} ]] && nonfatal mount-boot_check_status
+			nonfatal mount-boot_check_status
 		else
 			mount-boot_pkg_pretend
 		fi
@@ -229,8 +232,18 @@ src_prepare() {
 
 src_install() {
 
-	local FW_OPTIONS=( "-v" )
+	local FW_OPTIONS=( "-v" "-j1" )
 	git config --global --add safe.directory "${S}" || die
+	local files_to_keep=
+
+	if use savedconfig; then
+		if [[ -s "${S}/${PN}.conf" ]]; then
+			files_to_keep="${T}/files_to_keep.lst"
+			grep -v '^#' "${S}/${PN}.conf" 2>/dev/null > "${files_to_keep}" || die
+			[[ -s "${files_to_keep}" ]] || die "grep failed, empty config file?"
+			FW_OPTIONS+=( "--firmware-list" "${files_to_keep}" )
+		fi
+	fi
 
 	if use compress-xz; then
 		FW_OPTIONS+=( "--xz" )
@@ -295,29 +308,6 @@ src_install() {
 	# especially use !redistributable will cause some broken symlinks
 	einfo "Removing broken symlinks ..."
 	find * -xtype l -print -delete || die
-
-	if use savedconfig; then
-		if [[ -s "${S}/${PN}.conf" ]]; then
-			local files_to_keep="${T}/files_to_keep.lst"
-			grep -v '^#' "${S}/${PN}.conf" 2>/dev/null > "${files_to_keep}" || die
-			[[ -s "${files_to_keep}" ]] || die "grep failed, empty config file?"
-
-			einfo "Applying USE=savedconfig; Removing all files not listed in config ..."
-			find ! -type d -printf "%P\n" \
-				| grep -Fvx -f "${files_to_keep}" \
-				| xargs -d '\n' --no-run-if-empty rm -v
-
-			if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
-				die "Find failed to print installed files"
-			elif [[ ${PIPESTATUS[1]} -eq 2 ]]; then
-				# grep returns exit status 1 if no lines were selected
-				# which is the case when we want to keep all files
-				die "Grep failed to select files to keep"
-			elif [[ ${PIPESTATUS[2]} -ne 0 ]]; then
-				die "Failed to remove files not listed in config"
-			fi
-		fi
-	fi
 
 	# remove empty directories, bug #396073
 	find -type d -empty -delete || die
@@ -391,7 +381,7 @@ pkg_postinst() {
 
 	if use initramfs; then
 		if use dist-kernel; then
-			[[ -z ${ROOT} ]] && dist-kernel_reinstall_initramfs "${KV_DIR}" "${KV_FULL}"
+			dist-kernel_reinstall_initramfs "${KV_DIR}" "${KV_FULL}"
 		else
 			# Don't forget to umount /boot if it was previously mounted by us.
 			mount-boot_pkg_postinst

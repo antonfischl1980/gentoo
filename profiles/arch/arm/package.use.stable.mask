@@ -1,5 +1,9 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
+
+# Andreas Sturmlechner <asturm@gentoo.org> (2025-01-28)
+# PyQt 6 is not stable here
+>=app-admin/setools-4.5.1 gui test
 
 # Sam James <sam@gentoo.org> (2024-10-05)
 # media-libs/jasper fails tests (bug #907259)
@@ -26,7 +30,6 @@ app-admin/syslog-ng grpc
 # almost one year to this this date. bug 915548#c6
 dev-libs/hiredis test
 dev-python/redis test
-dev-python/sentry-sdk test
 
 # Matt Turner <mattst88@gentoo.org> (2023-10-30)
 # libei not stable yet

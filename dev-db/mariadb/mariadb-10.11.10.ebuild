@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -21,7 +21,7 @@ S="${WORKDIR}/mysql"
 
 LICENSE="GPL-2 LGPL-2.1+"
 SLOT="$(ver_cut 1-2)/${SUBSLOT:-0}"
-KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
+KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 IUSE="+backup bindist columnstore cracklib debug extraengine galera innodb-lz4
 	innodb-lzo innodb-snappy jdbc jemalloc kerberos latin1 mroonga
 	numa odbc oqgraph pam +perl profiling rocksdb selinux +server sphinx
@@ -37,8 +37,17 @@ REQUIRED_USE="jdbc? ( extraengine server !static )
 
 # Be warned, *DEPEND are version-dependant
 # These are used for both runtime and compiletime
+#
+# libfmt-10 contains a bug which was fixed in libfmt-11, see
+# https://jira.mariadb.org/browse/MDEV-32815, bug 946074
+# libfmt-11.1 works with # FMT_STATIC_THOUSANDS_SEPARATOR
+# differently, bug 946924
 COMMON_DEPEND="
 	dev-libs/libfmt:=
+	|| (
+		<dev-libs/libfmt-10
+		=dev-libs/libfmt-11.0*
+	)
 	>=dev-libs/libpcre2-10.34:=
 	>=sys-apps/texinfo-4.7-r1
 	sys-libs/ncurses:0=
@@ -288,6 +297,9 @@ src_configure() {
 	# It fails on alpha without this
 	use alpha && append-ldflags "-Wl,--no-relax"
 
+	# bug #945352
+	append-cflags -std=gnu17
+
 	append-cxxflags -felide-constructors
 
 	# bug #283926, with GCC4.4, this is required to get correct behavior.
@@ -353,6 +365,12 @@ src_configure() {
 		mycmakeargs+=( -DWITH_SSL=system -DCLIENT_PLUGIN_SHA256_PASSWORD=STATIC )
 	else
 		mycmakeargs+=( -DWITH_SSL=bundled )
+	fi
+
+	if use systemtap && has_version "dev-debug/systemtap[-dtrace-symlink(+)]" ; then
+		mycmakeargs+=(
+			-DDTRACE="${BROOT}"/usr/bin/stap-dtrace
+		)
 	fi
 
 	# bfd.h is only used starting with 10.1 and can be controlled by NOT_FOR_DISTRIBUTION
@@ -847,7 +865,7 @@ pkg_config() {
 		local n_X
 		let n_X=${#template}-${#template_wo_X}
 		if [[ ${n_X} -lt 3 ]] ; then
-			echo "${FUNCNAME[0]}: too few X's in template ‘${template}’" >&2
+			echo "${FUNCNAME[0]}: too few X's in template '${template}'" >&2
 			return
 		fi
 

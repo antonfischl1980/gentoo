@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -111,7 +111,7 @@ LICENSE="|| ( LGPL-3 MPL-1.1 )"
 SLOT="0"
 
 [[ ${MY_PV} == *9999* ]] || \
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~amd64-linux"
+KEYWORDS="amd64 ~arm arm64 ~loong ppc64 ~riscv ~x86 ~amd64-linux"
 
 COMMON_DEPEND="${PYTHON_DEPS}
 	app-arch/unzip
@@ -285,18 +285,18 @@ BDEPEND="
 	virtual/pkgconfig
 	clang? (
 		|| (
-			(	sys-devel/clang:18
-				sys-devel/llvm:18
-				=sys-devel/lld-18*	)
-			(	sys-devel/clang:17
-				sys-devel/llvm:17
-				=sys-devel/lld-17*	)
-			(	sys-devel/clang:16
-				sys-devel/llvm:16
-				=sys-devel/lld-16*	)
-			(	sys-devel/clang:15
-				sys-devel/llvm:15
-				=sys-devel/lld-15*	)
+			(	llvm-core/clang:18
+				llvm-core/llvm:18
+				=llvm-core/lld-18*	)
+			(	llvm-core/clang:17
+				llvm-core/llvm:17
+				=llvm-core/lld-17*	)
+			(	llvm-core/clang:16
+				llvm-core/llvm:16
+				=llvm-core/lld-16*	)
+			(	llvm-core/clang:15
+				llvm-core/llvm:15
+				=llvm-core/lld-15*	)
 		)
 	)
 	odk? ( >=app-text/doxygen-1.8.4 )
@@ -322,6 +322,7 @@ PATCHES=(
 
 	# 24.8 branch
 	"${FILESDIR}/${P}-no-std-basic_string-int.patch" # bug #923950
+	"${FILESDIR}/${P}-poppler-24.12.patch" # bug #943695
 
 	# git master
 	# bug #917618, thx to Debian:

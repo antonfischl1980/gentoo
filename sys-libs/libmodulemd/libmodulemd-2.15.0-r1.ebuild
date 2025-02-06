@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..12} )
+PYTHON_COMPAT=( python3_{10..13} )
 
 inherit meson python-single-r1
 
@@ -47,6 +47,10 @@ BDEPEND="
 		sys-libs/libmodulemd
 	)
 "
+
+PATCHES=(
+	"${FILESDIR}"/${PN}-2.15.0-glib-docs.patch
+)
 
 src_configure() {
 	local emesonargs=(

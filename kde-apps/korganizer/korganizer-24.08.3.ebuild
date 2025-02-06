@@ -15,7 +15,7 @@ HOMEPAGE="https://apps.kde.org/korganizer/"
 
 LICENSE="GPL-2+ handbook? ( FDL-1.2+ )"
 SLOT="6"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="amd64 arm64"
 IUSE="telemetry"
 
 # testkodaymatrix is broken, akonadi* tests need DBus, bug #665686
@@ -62,7 +62,7 @@ COMMON_DEPEND="
 "
 DEPEND="${COMMON_DEPEND}
 	>=kde-apps/kldap-${PVCUT}:6
-	test? ( >=kde-apps/akonadi-${PVCUT}:6[sqlite] )
+	test? ( =kde-apps/akonadi-${PVCUT}*:6[sqlite] )
 "
 RDEPEND="${COMMON_DEPEND}
 	!<kde-apps/kdepim-addons-24.07.50:*

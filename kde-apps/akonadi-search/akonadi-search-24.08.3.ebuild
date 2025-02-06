@@ -15,7 +15,7 @@ HOMEPAGE="https://invent.kde.org/pim/akonadi-search"
 
 LICENSE="GPL-2+ LGPL-2.1+"
 SLOT="6"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="amd64 arm64"
 IUSE=""
 
 RESTRICT="test" # perpetually broken, bug 662378
@@ -41,7 +41,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	dev-libs/boost
-	test? ( >=kde-apps/akonadi-${PVCUT}:6[mysql,postgres,sqlite] )
+	test? ( =kde-apps/akonadi-${PVCUT}*:6[mysql,postgres,sqlite] )
 "
 BDEPEND="
 	test? ( >=kde-apps/akonadi-${PVCUT}:6[tools] )

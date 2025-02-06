@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -7,13 +7,16 @@ inherit autotools
 
 DESCRIPTION="Command line tool for signing, verifying, encrypting and decrypting XML"
 HOMEPAGE="https://www.aleksey.com/xmlsec"
-SRC_URI="https://www.aleksey.com/xmlsec/download/${PN}1-${PV}.tar.gz"
+SRC_URI="
+	https://www.aleksey.com/xmlsec/download/${PN}1-${PV}.tar.gz
+	https://www.aleksey.com/xmlsec/download/older-releases/${PN}1-${PV}.tar.gz
+"
 S="${WORKDIR}/${PN}1-${PV}"
 
 LICENSE="MIT"
 # Upstream consider major version bumps to be changes in either X or Y in X.Y.Z
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
+KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv ~sparc x86"
 IUSE="doc gcrypt gnutls http nss +openssl static-libs test"
 RESTRICT="!test? ( test )"
 REQUIRED_USE="

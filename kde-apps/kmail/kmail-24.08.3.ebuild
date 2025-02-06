@@ -16,7 +16,7 @@ https://kontact.kde.org/components/kmail/"
 
 LICENSE="GPL-2+ handbook? ( FDL-1.2+ )"
 SLOT="6"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="amd64 arm64"
 IUSE="pch speech telemetry"
 
 RESTRICT="test" # bug 616878
@@ -81,7 +81,7 @@ COMMON_DEPEND="
 DEPEND="${COMMON_DEPEND}
 	>=kde-apps/kcalutils-${PVCUT}:6
 	>=kde-apps/kldap-${PVCUT}:6
-	test? ( >=kde-apps/akonadi-${PVCUT}:6[sqlite] )
+	test? ( =kde-apps/akonadi-${PVCUT}*:6[sqlite] )
 "
 RDEPEND="${COMMON_DEPEND}
 	>=kde-apps/kdepim-runtime-${PVCUT}:6

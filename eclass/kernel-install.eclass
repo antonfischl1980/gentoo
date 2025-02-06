@@ -1,4 +1,4 @@
-# Copyright 2020-2024 Gentoo Authors
+# Copyright 2020-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: kernel-install.eclass
@@ -162,9 +162,10 @@ if [[ ${KERNEL_IUSE_GENERIC_UKI} ]]; then
 		["sys-apps/rng-tools"]="GPL-2"
 		["sys-apps/sed"]="GPL-3+"
 		["sys-apps/shadow"]="BSD GPL-2"
-		["sys-apps/systemd[boot(-),cryptsetup,pkcs11,policykit,tpm,ukify(-)]"]="GPL-2 LGPL-2.1 MIT public-domain"
+		[">=sys-apps/systemd-257[boot(-),cryptsetup,pkcs11,policykit,tpm,ukify(-)]"]="GPL-2 LGPL-2.1 MIT public-domain"
 		["sys-apps/util-linux"]="GPL-2 GPL-3 LGPL-2.1 BSD-4 MIT public-domain"
 		["sys-auth/polkit"]="LGPL-2"
+		["sys-boot/plymouth[drm,systemd(+),udev]"]="GPL-2+"
 		["sys-block/nbd"]="GPL-2"
 		["sys-devel/gcc"]="GPL-3+ LGPL-3+ || ( GPL-3+ libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.3+"
 		["sys-fs/btrfs-progs"]="GPL-2"
@@ -190,6 +191,7 @@ if [[ ${KERNEL_IUSE_GENERIC_UKI} ]]; then
 		["sys-libs/readline"]="GPL-3+"
 		["sys-libs/zlib"]="ZLIB"
 		["sys-process/procps"]="GPL-2+ LGPL-2+ LGPL-2.1+"
+		["x11-libs/libdrm"]="MIT"
 		["amd64? ( sys-firmware/intel-microcode )"]="amd64? ( intel-ucode )"
 		["x86? ( sys-firmware/intel-microcode )"]="x86? ( intel-ucode )"
 	)
@@ -202,6 +204,7 @@ if [[ ${KERNEL_IUSE_GENERIC_UKI} ]]; then
 	"
 	IDEPEND="
 		generic-uki? (
+			app-crypt/sbsigntools
 			>=sys-kernel/installkernel-14[-dracut(-),-ugrd(-),-ukify(-)]
 		)
 		!generic-uki? (
@@ -605,6 +608,15 @@ kernel-install_pkg_preinst() {
 	[[ ! -d ${kernel_dir} ]] &&
 		die "Kernel directory ${kernel_dir} not installed!"
 
+	# We moved this in order to omit it from the binpkg, move it back
+	if [[ -r "${T}/signing_key.pem" ]]; then
+		# cp instead of mv to set owner to root in one go
+		(
+			umask 066 &&
+				cp "${T}/signing_key.pem" "${kernel_dir}/certs/signing_key.pem"
+		) || die
+	fi
+
 	# perform the version check for release ebuilds only
 	if [[ ${PV} != *9999 ]]; then
 		local expected_ver=$(dist-kernel_PV_to_KV "${PV}")
@@ -649,13 +661,65 @@ kernel-install_extract_from_uki() {
 	local extract_type=${1}
 	local uki=${2}
 	local out=${3}
+	local out_temp=${T}/${extract_type}-section-dumped
 
 	# objcopy overwrites input if there is no output, dump the output in T.
 	# We unfortunately cannot use /dev/null here
 	$(tc-getOBJCOPY) "${uki}" "${T}/dump.efi" \
-		--dump-section ".${extract_type}=${out}" ||
-		die "Failed to extract ${extract_type}"
-	chmod 644 "${out}" || die
+		--dump-section ".${extract_type}=${out_temp}" ||
+			die "Failed to extract ${extract_type}"
+
+	# Sanity checks for kernel images
+	if [[ ${extract_type} == linux ]] &&
+		{ ! in_iuse secureboot || use secureboot ;}
+	then
+		# Extract the used SECUREBOOT_SIGN_CERT to verify the kernel image
+		local cert=${T}/pcrpkey
+		kernel-install_extract_from_uki pcrpkey "${uki}" "${cert}"
+		if [[ $(head -n1 "${cert}") != "-----BEGIN CERTIFICATE-----" ]]; then
+			# This is a DER format certificate, convert it to PEM
+			openssl x509 \
+				-inform DER -in "${cert}" \
+				-outform PEM -out "${cert}" ||
+					die "Failed to convert pcrpkey to PEM format"
+		fi
+
+		# Check if the signature on the UKI is valid
+		sbverify --cert "${cert}" "${uki}" ||
+			die "ERROR: UKI signature is invalid"
+
+		# Check if the signature on the kernel image is valid
+		local sbverify_err=$(
+			sbverify --cert "${cert}" "${out_temp}" 2>&1 >/dev/null
+		)
+
+		# Check if there was a padding warning
+		if [[ ${sbverify_err} == "warning: data remaining"*": gaps between PE/COFF sections?"* ]]
+		then
+			# https://github.com/systemd/systemd/issues/35851
+			local proper_size=${sbverify_err#"warning: data remaining["}
+			proper_size=${proper_size%" vs"*}
+			# Strip the padding
+			head "${out_temp}" --bytes "${proper_size}" \
+				>"${out_temp}_trimmed" || die
+			# Check if the signature verifies now
+			sbverify_err=$(
+				sbverify --cert "${cert}" "${out_temp}_trimmed" 2>&1 >/dev/null
+			)
+			[[ -z ${sbverify_err} ]] && out_temp=${out_temp}_trimmed
+		fi
+
+		# Something has gone wrong, stop here to prevent installing a kernel
+		# with an invalid signature or a completely broken kernel image.
+		if [[ -n ${sbverify_err} ]]; then
+			eerror "${sbverify_err}"
+			die "ERROR: Kernel image signature is invalid"
+		else
+			einfo "Signature verification OK"
+		fi
+	fi
+
+	install -m 644 "${out_temp}" "${out}" || die
 }
 
 # @FUNCTION: kernel-install_install_all
@@ -714,9 +778,7 @@ kernel-install_pkg_postinst() {
 	dist-kernel_compressed_module_cleanup \
 		"${EROOT}/lib/modules/${KV_FULL}"
 
-	if [[ -z ${ROOT} ]]; then
-		kernel-install_install_all "${KV_FULL}"
-	fi
+	kernel-install_install_all "${KV_FULL}"
 
 	if [[ ${KERNEL_IUSE_GENERIC_UKI} ]] && use generic-uki; then
 		ewarn "The prebuilt initramfs and unified kernel image are highly experimental!"
@@ -738,9 +800,9 @@ kernel-install_pkg_postinst() {
 kernel-install_pkg_postrm() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	if [[ -z ${ROOT} && ! ${KERNEL_IUSE_GENERIC_UKI} ]]; then
-		local kernel_dir=${EROOT}/usr/src/linux-${KV_FULL}
-		local image_path=$(dist-kernel_get_image_path)
+	local kernel_dir=${EROOT}/usr/src/linux-${KV_FULL}
+	local image_path=$(dist-kernel_get_image_path)
+	if [[ ! ${KERNEL_IUSE_GENERIC_UKI} && -d ${kernel_dir} ]]; then
 		ebegin "Removing initramfs"
 		rm -f "${kernel_dir}/${image_path%/*}"/{initrd,uki.efi} &&
 			find "${kernel_dir}" -depth -type d -empty -delete
@@ -752,8 +814,6 @@ kernel-install_pkg_postrm() {
 # @DESCRIPTION:
 # Rebuild the initramfs and reinstall the kernel.
 kernel-install_pkg_config() {
-	[[ -z ${ROOT} ]] || die "ROOT!=/ not supported currently"
-
 	if [[ -z ${KV_FULL} ]]; then
 		KV_FULL=${PV}${KV_LOCALVERSION}
 	fi

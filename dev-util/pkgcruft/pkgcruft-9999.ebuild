@@ -1,12 +1,13 @@
-# Copyright 2023-2024 Gentoo Authors
+# Copyright 2023-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 CRATES=" "
-RUST_MIN_VER="1.80.0"
+LLVM_COMPAT=( {17..19} )
+RUST_MIN_VER="1.82.0"
 
-inherit cargo edo flag-o-matic toolchain-funcs
+inherit cargo edo llvm-r2 shell-completion toolchain-funcs
 
 DESCRIPTION="QA library and tools based on pkgcraft"
 HOMEPAGE="https://pkgcraft.github.io/"
@@ -33,11 +34,18 @@ RESTRICT="!test? ( test )"
 
 # clang needed for bindgen
 BDEPEND+="
-	sys-devel/clang
+	$(llvm_gen_dep '
+		llvm-core/clang:${LLVM_SLOT}
+	')
 	test? ( dev-util/cargo-nextest )
 "
 
 QA_FLAGS_IGNORED="usr/bin/pkgcruft"
+
+pkg_setup() {
+	llvm-r2_pkg_setup
+	rust_pkg_setup
+}
 
 src_unpack() {
 	if [[ ${PV} == 9999 ]] ; then
@@ -52,12 +60,24 @@ src_compile() {
 	# For scallop building bash
 	tc-export AR CC
 
-	# scallop uses modified bash-5.2 which relies on unprotoyped functions
-	append-cflags -std=gnu17
-
 	cargo_src_compile
+
+	if [[ ${PV} == 9999 ]] ; then
+		# https://github.com/pkgcraft/pkgcraft/issues/258
+		edo cargo run --features shell --bin pkgcruft-shell-comp -p pkgcruft
+	fi
 }
 
 src_test() {
+	unset CLICOLOR CLICOLOR_FORCE
+
 	edo cargo nextest run $(usev !debug '--release') --color always --all-features --tests
+}
+
+src_install() {
+	cargo_src_install
+
+	newbashcomp shell/pkgcruft.bash ${PN}
+	dozshcomp shell/_pkgcruft
+	dofishcomp shell/pkgcruft.fish
 }

@@ -1,4 +1,4 @@
-# Copyright 2021-2024 Gentoo Authors
+# Copyright 2021-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -11,12 +11,12 @@ LLVM_OPTIONAL=1
 # and 3rdparty/ tries to FetchContent gtest)
 QT6_RESTRICT_TESTS=1
 
-inherit desktop llvm-r1 optfeature qt6-build
+inherit desktop llvm-r2 optfeature qt6-build
 
 DESCRIPTION="Qt Tools Collection"
 
 if [[ ${QT6_BUILD_TYPE} == release ]]; then
-	KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~loong ~ppc ~ppc64 ~riscv ~x86"
 fi
 
 IUSE="
@@ -38,11 +38,11 @@ REQUIRED_USE="
 
 RDEPEND="
 	~dev-qt/qtbase-${PV}:6[widgets?]
-	assistant? ( ~dev-qt/qtbase-${PV}:6[network,sql,sqlite] )
+	assistant? ( ~dev-qt/qtbase-${PV}:6[concurrent,network,sql,sqlite] )
 	clang? (
 		$(llvm_gen_dep '
-			sys-devel/clang:${LLVM_SLOT}=
-			sys-devel/llvm:${LLVM_SLOT}=
+			llvm-core/clang:${LLVM_SLOT}=
+			llvm-core/llvm:${LLVM_SLOT}=
 		')
 	)
 	designer? (
@@ -62,11 +62,9 @@ DEPEND="
 	)
 "
 
-pkg_setup() {
-	use clang && llvm-r1_pkg_setup
-}
-
 src_configure() {
+	use clang && llvm_chost_setup
+
 	local mycmakeargs=(
 		# prevent the clang test as it can abort due to bug #916098
 		$(cmake_use_find_package clang WrapLibClang)

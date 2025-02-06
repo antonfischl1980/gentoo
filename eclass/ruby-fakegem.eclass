@@ -23,6 +23,8 @@ case ${EAPI} in
 	*) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
+# flag-o-matic is only required for ruby31 support.
+inherit flag-o-matic
 inherit ruby-ng
 
 # @ECLASS_VARIABLE: RUBY_FAKEGEM_NAME
@@ -424,6 +426,16 @@ EOF
 each_fakegem_configure() {
 	debug-print-function ${FUNCNAME} "$@"
 
+	# Ruby 3.1 has a varargs implementation that is not compatible with
+	# gnu23. Ruby 3.1 is EOL in March 2025 and will be removed shortly
+	# after that.
+	case ${RUBY} in
+		*ruby31)
+			append-flags -std=gnu17
+			filter-flags -std=gnu23
+			;;
+	esac
+
 	tc-export PKG_CONFIG
 	for extension in "${RUBY_FAKEGEM_EXTENSIONS[@]}" ; do
 		CC=$(tc-getCC) ${RUBY} --disable=did_you_mean -C ${extension%/*} ${extension##*/} --with-cflags="${CFLAGS}" --with-ldflags="${LDFLAGS}" ${RUBY_FAKEGEM_EXTENSION_OPTIONS} || die
@@ -612,7 +624,7 @@ each_fakegem_install() {
 	ruby_fakegem_install_gemspec
 
 	local _gemlibdirs="${RUBY_FAKEGEM_EXTRAINSTALL}"
-	for directory in "${RUBY_FAKEGEM_BINDIR}" lib; do
+	for directory in "${RUBY_FAKEGEM_BINDIR}" lib sig; do
 		[[ -d ${directory} ]] && _gemlibdirs="${_gemlibdirs} ${directory}"
 	done
 

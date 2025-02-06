@@ -1,4 +1,4 @@
-# Copyright 2024 Gentoo Authors
+# Copyright 2024-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -8,7 +8,7 @@ inherit qt6-build
 DESCRIPTION="Inter-Process Communication (IPC) library for the Qt6 framework"
 
 if [[ ${QT6_BUILD_TYPE} == release ]]; then
-	KEYWORDS="~amd64"
+	KEYWORDS="~amd64 ~loong"
 fi
 
 IUSE="qml"
@@ -34,6 +34,11 @@ src_configure() {
 }
 
 src_test() {
+	local CMAKE_SKIP_TESTS=(
+		# rarely fails randomly even with -j1, not looked further into
+		tst_modelview
+	)
+
 	# tests re-use 127.0.0.1:65213 and randomly fail if ran at same time
 	qt6-build_src_test -j1
 }

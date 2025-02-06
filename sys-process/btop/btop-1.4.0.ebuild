@@ -1,4 +1,4 @@
-# Copyright 2021-2024 Gentoo Authors
+# Copyright 2021-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -13,7 +13,7 @@ SRC_URI="
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~x86"
+KEYWORDS="amd64 ~arm arm64 ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv x86"
 
 BDEPEND="
 	app-text/lowdown
@@ -25,10 +25,10 @@ pkg_setup() {
 	if [[ "${MERGE_TYPE}" != "binary" ]]; then
 		if tc-is-clang ; then
 			if [[ "$(clang-major-version)" -lt 16 ]]; then
-				die "sys-process/btop requires >=sys-devel/clang-16.0.0 to build."
+				die "sys-process/btop requires >=llvm-core/clang-16.0.0 to build."
 			fi
 		elif ! tc-is-gcc ; then
-			die "$(tc-getCXX) is not a supported compiler. Please use sys-devel/gcc or >=sys-devel/clang-16.0.0 instead."
+			die "$(tc-getCXX) is not a supported compiler. Please use sys-devel/gcc or >=llvm-core/clang-16.0.0 instead."
 		fi
 	fi
 }

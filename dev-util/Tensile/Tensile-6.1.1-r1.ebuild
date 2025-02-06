@@ -29,10 +29,10 @@ RDEPEND="${PYTHON_DEPS}
 	dev-python/pyyaml[${PYTHON_USEDEP}]
 	dev-python/msgpack[${PYTHON_USEDEP}]
 	dev-python/joblib[${PYTHON_USEDEP}]
-	=dev-util/hip-6*
-	>=dev-util/rocm-smi-4.3.0
+	dev-util/hip:${SLOT}
+	dev-util/rocm-smi:${SLOT}
 	$(llvm_gen_dep '
-		sys-devel/clang:${LLVM_SLOT}
+		llvm-core/clang:${LLVM_SLOT}
 	')
 "
 DEPEND="${RDEPEND}"

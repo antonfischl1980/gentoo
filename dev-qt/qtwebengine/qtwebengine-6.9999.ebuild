@@ -10,7 +10,7 @@ inherit prefix python-any-r1 qt6-build toolchain-funcs
 
 DESCRIPTION="Library for rendering dynamic web content in Qt6 C++ and QML applications"
 SRC_URI+="
-	https://dev.gentoo.org/~ionen/distfiles/${PN}-6.8-patchset-5.tar.xz
+	https://dev.gentoo.org/~ionen/distfiles/${PN}-6.9-patchset-1.tar.xz
 "
 
 if [[ ${QT6_BUILD_TYPE} == release ]]; then
@@ -70,6 +70,7 @@ RDEPEND="
 	designer? ( ~dev-qt/qttools-${PV}:6[designer] )
 	geolocation? ( ~dev-qt/qtpositioning-${PV}:6 )
 	kerberos? ( virtual/krb5 )
+	opengl? ( media-libs/libglvnd[X] )
 	pulseaudio? ( media-libs/libpulse[glib] )
 	screencast? (
 		dev-libs/glib:2
@@ -85,11 +86,7 @@ DEPEND="
 	x11-libs/libXcursor
 	x11-libs/libXi
 	x11-libs/libxshmfence
-	opengl? ( media-libs/libglvnd[X] )
 	screencast? ( media-libs/libepoxy[egl(+)] )
-	test? (
-		widgets? ( app-text/poppler[cxx(+)] )
-	)
 	vaapi? (
 		vulkan? ( dev-util/vulkan-headers )
 	)
@@ -198,8 +195,9 @@ src_configure() {
 		-DQT_FEATURE_webengine_webchannel=ON
 		-DQT_FEATURE_webengine_webrtc=ON
 
-		# needs a modified ffmpeg to be usable, and even then it may not
-		# cooperate with new major ffmpeg versions (bug #831487)
+		# needs a modified ffmpeg to be usable (bug #831487), and even then
+		# it is picky about codecs/version and system's can lead to unexpected
+		# issues (e.g. builds but some files don't play even with support)
 		-DQT_FEATURE_webengine_system_ffmpeg=OFF
 
 		# use bundled re2 to avoid complications, Qt has also disabled
@@ -212,10 +210,11 @@ src_configure() {
 		-DQT_FEATURE_webengine_system_libvpx=OFF
 
 		# not necessary to pass these (default), but in case detection fails
+		# given qtbase's force_system_libs does not affect these right now
 		$(printf -- '-DQT_FEATURE_webengine_system_%s=ON ' \
 			freetype gbm glib harfbuzz lcms2 libevent libjpeg \
 			libopenjpeg2 libpci libpng libtiff libwebp libxml \
-			minizip opus poppler snappy zlib)
+			minizip opus snappy zlib)
 
 		# TODO: fixup gn cross, or package dev-qt/qtwebengine-gn with =ON
 		# (see also BUILD_ONLY_GN option added in 6.8+ for the latter)

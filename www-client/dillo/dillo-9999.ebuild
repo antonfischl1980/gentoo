@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -13,7 +13,7 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/dillo-browser/dillo.git"
 else
 	SRC_URI="https://github.com/dillo-browser/dillo/releases/download/v${PV}/${P}.tar.bz2"
-	KEYWORDS="~amd64"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 LICENSE="GPL-3"
@@ -24,13 +24,13 @@ REQUIRED_USE="
 "
 
 RDEPEND="
-	>=x11-libs/fltk-1.3:1
+	=x11-libs/fltk-1.3*:1=
 	sys-libs/zlib
 	x11-libs/libX11
 	jpeg? ( media-libs/libjpeg-turbo:= )
 	png? ( >=media-libs/libpng-1.2:= )
 	ssl? (
-		mbedtls? ( net-libs/mbedtls:= )
+		mbedtls? ( net-libs/mbedtls:0= )
 		openssl? ( dev-libs/openssl:= )
 	)
 	test? (
@@ -69,6 +69,7 @@ src_configure() {
 		$(use_enable png)
 		$(use_enable ssl tls)
 		$(use_enable xembed)
+		--enable-svg # Vendored nanosvg dep, no point in disabling
 		--enable-ipv6
 	)
 

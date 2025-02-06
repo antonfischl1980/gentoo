@@ -75,7 +75,7 @@ X_RDEPS="
 #   https://sourceforge.net/p/giflib/bugs/132/
 RDEPEND="
 	app-arch/bzip2
-	>=media-video/ffmpeg-4.0:=[vdpau?]
+	>=media-video/ffmpeg-5.1:=[vdpau?]
 	sys-libs/ncurses:=
 	sys-libs/zlib
 	a52? ( media-libs/a52dec )
@@ -169,7 +169,7 @@ RDEPEND+="selinux? ( sec-policy/selinux-mplayer )"
 LICENSE="GPL-2"
 SLOT="0"
 if [[ ${PV} != *9999* ]]; then
-	KEYWORDS="~alpha amd64 arm ~arm64 ~hppa ~ppc ~ppc64 ~riscv ~sparc x86"
+	KEYWORDS="~alpha amd64 arm ~arm64 ~hppa ppc ppc64 ~riscv ~sparc x86"
 fi
 
 # faac codecs are nonfree

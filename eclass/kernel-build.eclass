@@ -1,4 +1,4 @@
-# Copyright 2020-2024 Gentoo Authors
+# Copyright 2020-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: kernel-build.eclass
@@ -108,10 +108,14 @@ IUSE="+strip"
 # @ECLASS_VARIABLE: KERNEL_GENERIC_UKI_CMDLINE
 # @USER_VARIABLE
 # @DESCRIPTION:
-# If KERNEL_IUSE_GENERIC_UKI is set, this variable allows setting the
-# built-in kernel command line for the UKI. If unset, the default is
-# root=/dev/gpt-auto-root ro
-: "${KERNEL_GENERIC_UKI_CMDLINE:="root=/dev/gpt-auto-root ro"}"
+# If KERNEL_IUSE_GENERIC_UKI is set, and this variable is not
+# empty, then the contents are used as the first kernel cmdline
+# option of the multi-profile generic UKI. Supplementing the four
+# standard options of:
+# - root=/dev/gpt-auto-root ro
+# - root=/dev/gpt-auto-root ro quiet splash
+# - root=/dev/gpt-auto-root ro lockdown=integrity
+# - root=/dev/gpt-auto-root ro quiet splash lockdown=integrity
 
 if [[ ${KERNEL_IUSE_MODULES_SIGN} ]]; then
 	IUSE+=" modules-sign"
@@ -133,6 +137,9 @@ fi
 kernel-build_pkg_setup() {
 	python-any-r1_pkg_setup
 	if [[ ${KERNEL_IUSE_MODULES_SIGN} && ${MERGE_TYPE} != binary ]]; then
+		# inherits linux-info to check config values for keys
+		# ensure KV_FULL will not be set globally, that breaks configure
+		local KV_FULL
 		secureboot_pkg_setup
 
 		if use modules-sign && [[ -n ${MODULES_SIGN_KEY} ]]; then
@@ -371,8 +378,7 @@ kernel-build_src_install() {
 	local compress=()
 	if [[ ${KERNEL_IUSE_GENERIC_UKI} ]] && ! use modules-compress; then
 		compress+=(
-			# force installing uncompressed modules even if compression
-			# is enabled via config
+			# Workaround for <6.12, does not have CONFIG_MODULE_COMPRESS_ALL
 			suffix-y=
 		)
 	fi
@@ -441,6 +447,11 @@ kernel-build_src_install() {
 
 	# Copy built key/certificate files
 	cp -p build/certs/* "${ED}${kernel_dir}/certs/" || die
+	# If a key was generated, exclude it from the binpkg
+	local generated_key=${ED}${kernel_dir}/certs/signing_key.pem
+	if [[ -r ${generated_key} ]]; then
+		mv "${generated_key}" "${T}/signing_key.pem" || die
+	fi
 
 	# building modules fails with 'vmlinux has no symtab?' if stripped
 	use ppc64 && dostrip -x "${kernel_dir}/${image_path}"
@@ -498,10 +509,10 @@ kernel-build_src_install() {
 
 			local dracut_modules=(
 				base bash btrfs cifs crypt crypt-gpg crypt-loop dbus dbus-daemon
-				dm dmraid dracut-systemd fido2 i18n fs-lib kernel-modules
+				dm dmraid dracut-systemd drm fido2 i18n fs-lib kernel-modules
 				kernel-network-modules kernel-modules-extra lunmask lvm nbd
 				mdraid modsign network network-manager nfs nvdimm nvmf pcsc
-				pkcs11 qemu qemu-net resume rngd rootfs-block shutdown
+				pkcs11 plymouth qemu qemu-net resume rngd rootfs-block shutdown
 				systemd systemd-ac-power systemd-ask-password systemd-initrd
 				systemd-integritysetup systemd-pcrphase systemd-sysusers
 				systemd-udevd systemd-veritysetup terminfo tpm2-tss udev-rules
@@ -527,7 +538,7 @@ kernel-build_src_install() {
 				--ro-mnt
 				--modules "${dracut_modules[*]}"
 				# Pulls in huge firmware files
-				--omit-drivers "nfp"
+				--omit-drivers "amdgpu i915 nfp nouveau nvidia xe"
 			)
 
 			# Tries to update ld cache
@@ -535,29 +546,81 @@ kernel-build_src_install() {
 			dracut "${dracut_args[@]}" "${image%/*}/initrd" ||
 				die "Failed to generate initramfs"
 
+			# Note, we cannot use an associative array here because those are
+			# not ordered.
+			local profiles=()
+			local cmdlines=()
+
+			# If defined, make the user entry the first and default
+			if [[ -n ${KERNEL_GENERIC_UKI_CMDLINE} ]]; then
+				profiles+=(
+					$'TITLE=User specified at build time\nID=user'
+				)
+				cmdlines+=( "${KERNEL_GENERIC_UKI_CMDLINE}" )
+			fi
+
+			profiles+=(
+				$'TITLE=Default\nID=default'
+				$'TITLE=Default with splash\nID=splash'
+				$'TITLE=Default with lockdown\nID=lockdown'
+				$'TITLE=Default with splash and lockdown\nID=splash-lockdown'
+			)
+
+			cmdlines+=(
+				"root=/dev/gpt-auto-root ro"
+				"root=/dev/gpt-auto-root ro quiet splash"
+				"root=/dev/gpt-auto-root ro lockdown=integrity"
+				"root=/dev/gpt-auto-root ro quiet splash lockdown=integrity"
+			)
+
 			local ukify_args=(
 				--linux="${image}"
 				--initrd="${image%/*}/initrd"
-				--cmdline="${KERNEL_GENERIC_UKI_CMDLINE}"
 				--uname="${KV_FULL}"
 				--output="${image%/*}/uki.efi"
-			)
+				--profile="${profiles[0]}"
+				--cmdline="${cmdlines[0]}"
+			) # 0th profile is default
+
+			# Additional profiles have to be added with --join-profile
+			local i
+			for (( i=1; i<"${#profiles[@]}"; i++ )); do
+				ukify build \
+					--profile="${profiles[i]}" \
+					--cmdline="${cmdlines[i]}" \
+					--output="${T}/profile${i}.efi" ||
+						die "Failed to create profile ${i}"
+
+				ukify_args+=( --join-profile="${T}/profile${i}.efi" )
+			done
 
 			if [[ ${KERNEL_IUSE_MODULES_SIGN} ]] && use secureboot; then
+				# --pcrpkey is appended as is. If the certificate and key
+				# are in the same file, we could accidentally leak the key
+				# into the UKI. Pass the certificate through openssl to ensure
+				# that it truly contains *only* the certificate.
+				openssl x509 \
+					-in "${SECUREBOOT_SIGN_CERT}" -inform PEM \
+					-out "${T}/pcrpkey.pem" -outform PEM ||
+						die "Failed to extract certificate"
 				ukify_args+=(
-					--signtool=sbsign
 					--secureboot-private-key="${SECUREBOOT_SIGN_KEY}"
 					--secureboot-certificate="${SECUREBOOT_SIGN_CERT}"
+					--pcrpkey="${T}/pcrpkey.pem"
+					--measure
 				)
 				if [[ ${SECUREBOOT_SIGN_KEY} == pkcs11:* ]]; then
 					ukify_args+=(
 						--signing-engine="pkcs11"
+						--pcr-private-key="${SECUREBOOT_SIGN_KEY}"
+						--pcr-public-key="${SECUREBOOT_SIGN_CERT}"
+						--phases="enter-initrd"
+						--pcr-private-key="${SECUREBOOT_SIGN_KEY}"
+						--pcr-public-key="${SECUREBOOT_SIGN_CERT}"
+						--phases="enter-initrd:leave-initrd enter-initrd:leave-initrd:sysinit enter-initrd:leave-initrd:sysinit:ready"
 					)
 				else
-					# Sytemd-measure does not currently support pkcs11
 					ukify_args+=(
-						--measure
-						--pcrpkey="${ED}${kernel_dir}/certs/signing_key.x509"
 						--pcr-private-key="${SECUREBOOT_SIGN_KEY}"
 						--phases="enter-initrd"
 						--pcr-private-key="${SECUREBOOT_SIGN_KEY}"
@@ -566,9 +629,7 @@ kernel-build_src_install() {
 				fi
 			fi
 
-			# systemd<255 does not install ukify in /usr/bin
-			PATH="${PATH}:${BROOT}/usr/lib/systemd:${BROOT}/lib/systemd" \
-				ukify build "${ukify_args[@]}" || die "Failed to generate UKI"
+			ukify build "${ukify_args[@]}" || die "Failed to generate UKI"
 
 			# Overwrite unnecessary image types to save space
 			> "${image}" || die
@@ -598,7 +659,6 @@ kernel-build_pkg_postinst() {
 			ewarn "MODULES_SIGN_KEY was not set, this means the kernel build system"
 			ewarn "automatically generated the signing key. This key was installed"
 			ewarn "in ${EROOT}/usr/src/linux-${KV_FULL}/certs"
-			ewarn "and will also be included in any binary packages."
 			ewarn "Please take appropriate action to protect the key!"
 			ewarn
 			ewarn "Recompiling this package causes a new key to be generated. As"
@@ -656,12 +716,22 @@ kernel-build_merge_configs() {
 
 	# Only semi-related but let's use that to avoid changing stable ebuilds.
 	if [[ ${KERNEL_IUSE_GENERIC_UKI} ]]; then
-		# NB: we enable this even with USE=-modules-compress, in order
-		# to support both uncompressed and compressed modules in prebuilt
-		# kernels
+		# NB: we enable support for compressed modules even with
+		# USE=-modules-compress, in order to support both uncompressed and
+		# compressed modules in prebuilt kernels.
 		cat <<-EOF > "${WORKDIR}/module-compress.config" || die
+			CONFIG_MODULE_COMPRESS=y
 			CONFIG_MODULE_COMPRESS_XZ=y
 		EOF
+		# CONFIG_MODULE_COMPRESS_ALL is supported only by >=6.12, for older
+		# versions we accomplish the same by overriding suffix-y=
+		if use modules-compress; then
+			echo "CONFIG_MODULE_COMPRESS_ALL=y" \
+				>> "${WORKDIR}/module-compress.config" || die
+		else
+			echo "# CONFIG_MODULE_COMPRESS_ALL is not set" \
+				>> "${WORKDIR}/module-compress.config" || die
+		fi
 		merge_configs+=( "${WORKDIR}/module-compress.config" )
 	fi
 

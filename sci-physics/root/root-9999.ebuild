@@ -6,7 +6,7 @@ EAPI=8
 # ninja does not work due to fortran
 CMAKE_MAKEFILE_GENERATOR=emake
 FORTRAN_NEEDED="fortran"
-PYTHON_COMPAT=( python3_{9..12} )
+PYTHON_COMPAT=( python3_{10..12} )
 
 inherit cmake cuda flag-o-matic fortran-2 python-single-r1 toolchain-funcs
 
@@ -16,7 +16,7 @@ LICENSE="LGPL-2.1 freedist MSttfEULA LGPL-3 libpng UoI-NCSA"
 
 IUSE="+X aqua +asimage cuda cudnn +davix debug +examples fits fftw fortran
 	+gdml graphviz +gsl +http jupyter libcxx +minuit mpi mysql odbc +opengl
-	postgres pythia8 +python qt5 qt6 R +roofit +root7 shadow sqlite +ssl
+	postgres pythia8 +python qt6 R +roofit +root7 shadow sqlite +ssl
 	+tbb test +tmva +unuran uring vc +xml xrootd"
 
 if [[ ${PV} =~ "9999" ]] ; then
@@ -40,11 +40,10 @@ PROPERTIES="test_network"
 REQUIRED_USE="
 	cuda? ( tmva )
 	cudnn? ( cuda )
-	!X? ( !asimage !opengl !qt5 !qt6 )
+	!X? ( !asimage !opengl !qt6 )
 	davix? ( ssl xml )
 	jupyter? ( python )
 	python? ( ${PYTHON_REQUIRED_USE} )
-	qt5? ( root7 http )
 	qt6? ( root7 http )
 	roofit? ( minuit )
 	tmva? ( gsl python )
@@ -77,10 +76,6 @@ CDEPEND="
 			virtual/glu
 			x11-libs/gl2ps:0=
 		)
-		qt5? (
-			dev-qt/qtcore:5
-			dev-qt/qtwebengine:5[widgets]
-		)
 		qt6? (
 			dev-qt/qtbase:6
 			dev-qt/qtwebengine:6[widgets]
@@ -94,7 +89,7 @@ CDEPEND="
 	graphviz? ( media-gfx/graphviz )
 	gsl? ( sci-libs/gsl:= )
 	http? ( dev-libs/fcgi:0= )
-	libcxx? ( sys-libs/libcxx )
+	libcxx? ( llvm-runtimes/libcxx )
 	unuran? ( sci-mathematics/unuran:0= )
 	mpi? ( virtual/mpi[fortran?] )
 	mysql? ( dev-db/mysql-connector-c )
@@ -270,7 +265,7 @@ src_configure() {
 		-Dpgsql=$(usex postgres)
 		-Dpyroot=$(usex python) # python was renamed to pyroot
 		-Dpythia8=$(usex pythia8)
-		-Dqt5web=$(usex qt5)
+		-Dqt5web=OFF # $(usex qt5)
 		-Dqt6web=$(usex qt6)
 		-Dr=$(usex R)
 		-Droofit=$(usex roofit)

@@ -1,4 +1,4 @@
-# Copyright 2019-2024 Gentoo Authors
+# Copyright 2019-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: llvm.org.eclass
@@ -57,7 +57,7 @@ LLVM_VERSION=$(ver_cut 1-3)
 # @DESCRIPTION:
 # The major version of current LLVM trunk.  Used to determine
 # the correct branch to use.
-_LLVM_MAIN_MAJOR=20
+_LLVM_MAIN_MAJOR=21
 
 # @ECLASS_VARIABLE: _LLVM_SOURCE_TYPE
 # @INTERNAL
@@ -72,11 +72,11 @@ if [[ -z ${_LLVM_SOURCE_TYPE+1} ]]; then
 			_LLVM_SOURCE_TYPE=snapshot
 
 			case ${PV} in
-				20.0.0_pre20241123)
-					EGIT_COMMIT=19ddafafdf131aed40abbdaf5af1fb7b59c1e8ac
+				21.0.0_pre20250201)
+					EGIT_COMMIT=bfa7edcc6652bdb37d53e0cec64926aab3f280eb
 					;;
-				20.0.0_pre20241118)
-					EGIT_COMMIT=a6385a3fc8a88f092d07672210a1e773481c2919
+				20.0.0_pre20250125)
+					EGIT_COMMIT=1f26ac10ca1bef40a80be8f81a6f109713bc586f
 					;;
 				*)
 					die "Unknown snapshot: ${PV}"
@@ -140,7 +140,7 @@ fi
 #   and REQUIRED_USE will be added but no dependencies.
 #
 # - llvm - this package uses targets from LLVM.  RDEPEND+DEPEND
-#   on matching sys-devel/llvm versions with requested flags will
+#   on matching llvm-core/llvm versions with requested flags will
 #   be added.
 #
 # Note that you still need to pass enabled targets to the build system,
@@ -185,14 +185,26 @@ case ${LLVM_MAJOR} in
 		)
 		;;
 	*)
-		ALL_LLVM_EXPERIMENTAL_TARGETS=(
-			ARC CSKY DirectX M68k SPIRV Xtensa
-		)
-		ALL_LLVM_PRODUCTION_TARGETS=(
-			AArch64 AMDGPU ARM AVR BPF Hexagon Lanai LoongArch Mips
-			MSP430 NVPTX PowerPC RISCV Sparc SystemZ VE WebAssembly X86
-			XCore
-		)
+		# TODO: limit to < 20 when we remove old snapshots
+		if ver_test ${PV} -lt 20.0.0_pre20250122; then
+			ALL_LLVM_EXPERIMENTAL_TARGETS=(
+				ARC CSKY DirectX M68k SPIRV Xtensa
+			)
+			ALL_LLVM_PRODUCTION_TARGETS=(
+				AArch64 AMDGPU ARM AVR BPF Hexagon Lanai LoongArch Mips
+				MSP430 NVPTX PowerPC RISCV Sparc SystemZ VE WebAssembly X86
+				XCore
+			)
+		else
+			ALL_LLVM_EXPERIMENTAL_TARGETS=(
+				ARC CSKY DirectX M68k Xtensa
+			)
+			ALL_LLVM_PRODUCTION_TARGETS=(
+				AArch64 AMDGPU ARM AVR BPF Hexagon Lanai LoongArch Mips
+				MSP430 NVPTX PowerPC RISCV Sparc SPIRV SystemZ VE
+				WebAssembly X86 XCore
+			)
+		fi
 		;;
 esac
 
@@ -330,7 +342,7 @@ llvm.org_set_globals() {
 			local dep=
 			for x in "${ALL_LLVM_TARGET_FLAGS[@]}"; do
 				dep+="
-					${x}? ( ~sys-devel/llvm-${PV}[${x}] )"
+					${x}? ( ~llvm-core/llvm-${PV}[${x}] )"
 			done
 			RDEPEND+=" ${dep}"
 			DEPEND+=" ${dep}"

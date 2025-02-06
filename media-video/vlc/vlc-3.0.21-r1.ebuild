@@ -1,4 +1,4 @@
-# Copyright 2000-2024 Gentoo Authors
+# Copyright 2000-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -21,7 +21,7 @@ else
 		SRC_URI="https://download.videolan.org/pub/videolan/testing/${MY_P}/${MY_P}.tar.xz"
 	fi
 	S="${WORKDIR}/${MY_P}"
-	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv -sparc ~x86"
+	KEYWORDS="amd64 ~arm arm64 ~loong ppc ppc64 ~riscv -sparc x86"
 fi
 inherit autotools flag-o-matic lua-single toolchain-funcs virtualx xdg
 
@@ -233,7 +233,8 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-3.0.11.1-configure_lua_version.patch
 	"${FILESDIR}"/${PN}-3.0.18-drop-minizip-dep.patch
 	"${FILESDIR}"/${PN}-3.0.21-freerdp-2.patch # bug 919296, 590164
-	"${FILESDIR}"/${PN}-3.0.21-vaapi-without-ffmepg4.patch # bug 864721, thx Fedora
+	"${FILESDIR}"/${PN}-3.0.21-vaapi-without-ffmpeg4.patch # bug 864721, thx Fedora
+	"${FILESDIR}"/${PN}-3.0.2.1-vdpau.patch # bug 946178
 )
 
 DOCS=( AUTHORS THANKS NEWS README doc/fortunes.txt )

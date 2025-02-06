@@ -58,7 +58,6 @@ RDEPEND="
 		dev-python/twisted[${PYTHON_USEDEP}]
 
 		dev-python/qtpy[widgets,gui,svg,multimedia,${PYTHON_USEDEP}]
-		|| ( dev-python/qtpy[pyside2] dev-python/qtpy[pyside6] )
 
 		media-libs/opencv[python,png,jpeg,${PYTHON_USEDEP}]
 		media-video/ffmpeg
@@ -145,5 +144,5 @@ pkg_postinst() {
 	optfeature "automatic port forwarding support" "net-libs/miniupnpc"
 	optfeature "memory compression in the client" "dev-python/lz4"
 	optfeature "SOCKS proxy support" "dev-python/requests[socks5]" "dev-python/pysocks"
-	optfeature "bandwidth charts support" "dev-python/pyside2[charts]" "dev-python/pyside6[charts]"
+	optfeature "bandwidth charts support" "dev-python/pyside[charts]"
 }

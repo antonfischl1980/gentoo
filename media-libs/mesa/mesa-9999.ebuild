@@ -1,9 +1,9 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-LLVM_COMPAT=( {15..18} )
+LLVM_COMPAT=( {15..19} )
 LLVM_OPTIONAL=1
 CARGO_OPTIONAL=1
 PYTHON_COMPAT=( python3_{10..13} )
@@ -20,7 +20,8 @@ CRATES="
 	paste@1.0.14
 "
 
-RUST_MIN_VER="1.74.1"
+RUST_MIN_VER="1.78.0"
+RUST_MULTILIB=1
 RUST_OPTIONAL=1
 
 inherit cargo
@@ -92,15 +93,17 @@ REQUIRED_USE="
 LIBDRM_DEPSTRING=">=x11-libs/libdrm-2.4.121"
 RDEPEND="
 	>=dev-libs/expat-2.1.0-r3[${MULTILIB_USEDEP}]
+	>=dev-util/spirv-tools-1.3.231.0[${MULTILIB_USEDEP}]
 	>=media-libs/libglvnd-1.3.2[X?,${MULTILIB_USEDEP}]
 	>=sys-libs/zlib-1.2.9[${MULTILIB_USEDEP}]
 	unwind? ( sys-libs/libunwind[${MULTILIB_USEDEP}] )
 	llvm? (
 		$(llvm_gen_dep "
-			sys-devel/llvm:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
+			llvm-core/llvm:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
 			opencl? (
 				dev-util/spirv-llvm-translator:\${LLVM_SLOT}
-				sys-devel/clang:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
+				llvm-core/clang:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
+				=llvm-core/libclc-\${LLVM_SLOT}*[spirv(-)]
 			)
 		")
 		video_cards_r600? (
@@ -113,8 +116,7 @@ RDEPEND="
 	lm-sensors? ( sys-apps/lm-sensors:=[${MULTILIB_USEDEP}] )
 	opencl? (
 		>=virtual/opencl-3
-		dev-libs/libclc[spirv(-)]
-		>=dev-util/spirv-tools-1.3.231.0
+		llvm-core/libclc[spirv(-)]
 		virtual/libelf:0=
 	)
 	vaapi? (
@@ -171,8 +173,8 @@ BDEPEND="
 		dev-python/pyyaml[\${PYTHON_USEDEP}]
 	")
 	video_cards_intel? (
-		~dev-util/intel_clc-${PV}
-		dev-libs/libclc[spirv(-)]
+		~dev-util/mesa_clc-${PV}
+		llvm-core/libclc[spirv(-)]
 		$(python_gen_any_dep "dev-python/ply[\${PYTHON_USEDEP}]")
 	)
 	vulkan? (
@@ -188,7 +190,7 @@ BDEPEND="
 
 QA_WX_LOAD="
 x86? (
-	usr/lib/libglapi.so.0.0.0
+	usr/lib/libgallium-*.so
 	usr/lib/libOSMesa.so.8.0.0
 	usr/lib/libGLX_mesa.so.0.0.0
 )"
@@ -276,8 +278,8 @@ python_check_deps() {
 
 pkg_setup() {
 	# warning message for bug 459306
-	if use llvm && has_version sys-devel/llvm[!debug=]; then
-		ewarn "Mismatch between debug USE flags in media-libs/mesa and sys-devel/llvm"
+	if use llvm && has_version llvm-core/llvm[!debug=]; then
+		ewarn "Mismatch between debug USE flags in media-libs/mesa and llvm-core/llvm"
 		ewarn "detected! This can cause problems. For details, see bug 459306."
 	fi
 
@@ -443,6 +445,7 @@ multilib_src_configure() {
 	emesonargs+=(
 		$(meson_use test build-tests)
 		-Dshared-glapi=enabled
+		-Dlegacy-x11=dri2
 		-Dexpat=enabled
 		$(meson_use opengl)
 		$(meson_feature opengl gbm)
@@ -457,7 +460,7 @@ multilib_src_configure() {
 		$(meson_feature unwind libunwind)
 		$(meson_feature zstd)
 		$(meson_use cpu_flags_x86_sse2 sse2)
-		-Dintel-clc=$(usex video_cards_intel system auto)
+		-Dmesa-clc=$(usex video_cards_intel system auto)
 		-Dvalgrind=$(usex valgrind auto disabled)
 		-Dvideo-codecs=$(usex proprietary-codecs "all" "all_free")
 		-Dgallium-drivers=$(driver_list "${GALLIUM_DRIVERS[*]}")
@@ -468,6 +471,15 @@ multilib_src_configure() {
 
 	if ! multilib_is_native_abi && use video_cards_nvk; then
 		sed -i -E '{N; s/(rule rust_COMPILER_FOR_BUILD\n command = rustc) --target=[a-zA-Z0-9=:-]+ (.*) -C link-arg=-m[[:digit:]]+/\1 \2/g}' build.ninja || die
+	fi
+}
+
+multilib_src_compile() {
+	if [[ ${ABI} == x86 ]]; then
+		# Bug 939803
+		BINDGEN_EXTRA_CLANG_ARGS="-m32" meson_src_compile
+	else
+		meson_src_compile
 	fi
 }
 

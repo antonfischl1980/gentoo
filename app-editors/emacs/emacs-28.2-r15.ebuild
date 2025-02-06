@@ -1,9 +1,9 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-inherit autotools elisp-common flag-o-matic readme.gentoo-r1 toolchain-funcs
+inherit autotools eapi9-pipestatus elisp-common flag-o-matic readme.gentoo-r1 toolchain-funcs
 
 if [[ ${PV##*.} = 9999 ]]; then
 	inherit git-r3
@@ -32,7 +32,7 @@ else
 		SRC_URI="https://alpha.gnu.org/gnu/emacs/pretest/${PN}-${PV/_/-}.tar.xz"
 	fi
 	# Patchset from proj/emacs-patches.git
-	SRC_URI+=" https://dev.gentoo.org/~ulm/emacs/${P}-patches-9.tar.xz"
+	SRC_URI+=" https://dev.gentoo.org/~ulm/emacs/${P}-patches-10.tar.xz"
 	PATCHES=("${WORKDIR}/patch")
 	SLOT="${PV%%.*}"
 	[[ ${PV} == *.*.* ]] && SLOT+="-vcs"
@@ -137,10 +137,7 @@ EMACS_SUFFIX="emacs-${SLOT}"
 SITEFILE="20${EMACS_SUFFIX}-gentoo.el"
 
 # Suppress false positive QA warnings #898304 #925449
-QA_CONFIG_IMPL_DECL_SKIP=(
-	malloc_set_state malloc_get_state MIN
-	statvfs64 re_set_syntax re_compile_pattern re_search re_match
-)
+QA_CONFIG_IMPL_DECL_SKIP=( malloc_{get,set}_state statvfs64 )
 
 src_prepare() {
 	if [[ ${PV##*.} = 9999 ]]; then
@@ -162,11 +159,21 @@ src_prepare() {
 		# for live ebuilds FULL_VERSION doesn't exist in global scope
 		QA_FLAGS_IGNORED="usr/$(get_libdir)/emacs/${FULL_VERSION}/native-lisp/.*"
 
+		# The build system requires gcc for native compilation #874657
+		if ! tc-is-gcc; then
+			ewarn "Emacs must be built with gcc[jit] if USE=jit is enabled."
+			ewarn "Ignoring CC=$(tc-getCC) and forcing ${CHOST}-gcc"
+			export CC=${CHOST}-gcc AR=${CHOST}-gcc-ar NM=${CHOST}-gcc-nm \
+				RANLIB=${CHOST}-gcc-ranlib
+			tc-is-gcc || die "tc-is-gcc failed in spite of CC=${CC}"
+		fi
+
 		# gccjit doesn't play well with ccache or distcc #801580
 		# For now, work around the problem with an explicit LIBRARY_PATH
-		has ccache ${FEATURES} || has distcc ${FEATURES} && tc-is-gcc \
-			&& export LIBRARY_PATH=$("$(tc-getCC)" -print-search-dirs \
+		if has ccache ${FEATURES} || has distcc ${FEATURES} && tc-is-gcc; then
+			export LIBRARY_PATH=$("$(tc-getCC)" -print-search-dirs \
 				| sed -n '/^libraries:/{s:^[^/]*::;p}')
+		fi
 	fi
 
 	default
@@ -448,14 +455,14 @@ src_install() {
 			-e "/^ExecStart/s,emacs,${EPREFIX}/usr/bin/${EMACS_SUFFIX}," \
 			-e "/^ExecStop/s,emacsclient,${EPREFIX}/usr/bin/&-${EMACS_SUFFIX}," \
 			etc/emacs.service | newins - ${EMACS_SUFFIX}.service
-		assert
+		pipestatus || die
 	fi
 
 	if use gzip-el; then
 		# compress .el files when a corresponding .elc exists
 		find "${ED}"/usr/share/emacs/${FULL_VERSION}/lisp -type f \
 			-name "*.elc" -print | sed 's/\.elc$/.el/' | xargs gzip -9n
-		assert "gzip .el failed"
+		pipestatus || die "gzip .el pipeline failed"
 	fi
 
 	local cdir
@@ -485,7 +492,7 @@ src_install() {
 	X	   (while (and (cdr q) (not (string-match re (cadr q))))
 	X	     (setq q (cdr q)))
 	X	   (setcdr q (cons dir (delete dir (cdr q))))
-	X	   (setenv "INFOPATH" (mapconcat 'identity (cdr p) ":"))))))
+	X	   (setenv "INFOPATH" (mapconcat #'identity (cdr p) ":"))))))
 	EOF
 	elisp-site-file-install "${T}/${SITEFILE}" || die
 
@@ -534,16 +541,13 @@ pkg_postinst() {
 	elisp-site-regen
 	readme.gentoo_print_elog
 
-	if use livecd; then
-		# force an update of the emacs symlink for the livecd/dvd,
-		# because some microemacs packages set it with USE=livecd
-		eselect emacs update
-	else
-		eselect emacs update ifunset
-	fi
+	# Force an update of the emacs symlink for the livecd/dvd,
+	# because some microemacs packages set it with USE=livecd.
+	# Otherwise, create it only when it is not yet set.
+	eselect --root="${ROOT}" emacs update $(usev !livecd ifunset)
 }
 
 pkg_postrm() {
 	elisp-site-regen
-	eselect emacs update ifunset
+	eselect --root="${ROOT}" emacs update ifunset
 }

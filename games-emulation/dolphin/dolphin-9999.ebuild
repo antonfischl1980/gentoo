@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -48,7 +48,7 @@ else
 				-> mgba-${MGBA_COMMIT}.tar.gz
 		)
 	"
-	KEYWORDS="~amd64"
+	KEYWORDS="~amd64 ~arm64"
 fi
 
 DESCRIPTION="Gamecube and Wii game emulator"
@@ -80,7 +80,7 @@ RDEPEND="
 	media-libs/libsfml:=
 	media-libs/libspng
 	>=net-libs/enet-1.3.18:1.3=
-	net-libs/mbedtls:=
+	net-libs/mbedtls:0=
 	net-misc/curl
 	x11-libs/libX11
 	x11-libs/libXi
@@ -98,7 +98,7 @@ RDEPEND="
 		dev-qt/qtbase:6[gui,widgets]
 		dev-qt/qtsvg:6
 	)
-	llvm? ( $(llvm_gen_dep 'sys-devel/llvm:${LLVM_SLOT}=') )
+	llvm? ( $(llvm_gen_dep 'llvm-core/llvm:${LLVM_SLOT}=') )
 	profile? ( dev-util/oprofile )
 	pulseaudio? ( media-libs/libpulse )
 	sdl? ( media-libs/libsdl2 )
@@ -126,6 +126,8 @@ declare -A KEEP_BUNDLED=(
 	# please keep this list in CMakeLists.txt order
 
 	# TODO: use system libraries
+	# bug #873952
+	# https://github.com/dolphin-emu/dolphin/pull/13089
 	[zlib-ng]=ZLIB
 	[minizip-ng]=ZLIB
 
@@ -154,7 +156,6 @@ declare -A KEEP_BUNDLED=(
 )
 
 PATCHES=(
-	"${FILESDIR}"/dolphin-2407-libfmt-11-fix.patch
 	"${FILESDIR}"/dolphin-2407-minizip.patch
 )
 
@@ -195,11 +196,6 @@ src_prepare() {
 	einfo "removing sources: ${remove[*]}"
 	rm -r "${remove[@]}" || die
 
-	# About 50% compile-time speedup
-	if ! use vulkan; then
-		sed -i -e '/Externals\/glslang/d' CMakeLists.txt || die
-	fi
-
 	# Remove dirty suffix: needed for netplay
 	sed -i -e 's/--dirty/&=""/' CMake/ScmRevGen.cmake || die
 }
@@ -225,7 +221,6 @@ src_configure() {
 		-DENCODE_FRAMEDUMPS=$(usex ffmpeg)
 		-DFASTLOG=$(usex log)
 		-DOPROFILING=$(usex profile)
-		-DSTEAM=OFF
 		-DUSE_DISCORD_PRESENCE=$(usex discord-presence)
 		-DUSE_MGBA=$(usex mgba)
 		-DUSE_RETRO_ACHIEVEMENTS=OFF
@@ -241,7 +236,6 @@ src_configure() {
 		-DUSE_SYSTEM_BZIP2=ON
 		-DUSE_SYSTEM_LIBLZMA=ON
 		-DUSE_SYSTEM_ZSTD=ON
-		-DUSE_SYSTEM_ZLIB=OFF
 		-DUSE_SYSTEM_MINIZIP=OFF
 		-DUSE_SYSTEM_LZO=ON
 		-DUSE_SYSTEM_LZ4=ON

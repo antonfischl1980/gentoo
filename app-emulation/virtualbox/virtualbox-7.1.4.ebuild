@@ -1,4 +1,4 @@
-# Copyright 2022-2024 Gentoo Authors
+# Copyright 2022-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -28,14 +28,14 @@ DESCRIPTION="Family of powerful x86 virtualization products for enterprise and h
 HOMEPAGE="https://www.virtualbox.org/"
 SRC_URI="
 	https://download.virtualbox.org/virtualbox/${PV}/${MY_P}.tar.bz2
-	https://gitweb.gentoo.org/proj/virtualbox-patches.git/snapshot/virtualbox-patches-7.1.0.tar.bz2
+	https://gitweb.gentoo.org/proj/virtualbox-patches.git/snapshot/virtualbox-patches-7.1.4-r1.tar.bz2
 	gui? ( !doc? ( https://dev.gentoo.org/~ceamac/${CATEGORY}/${PN}/${PN}-help-${HELP_PV}.tar.xz ) )
 "
 S="${WORKDIR}/${MY_PN}-${PV}"
 
 LICENSE="GPL-2+ GPL-3 LGPL-2.1 MIT dtrace? ( CDDL )"
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 IUSE="alsa dbus debug doc dtrace +gui java lvm nls pam pch pulseaudio +opengl python +sdk +sdl test +udev vboxwebsrv vde +vmmraw vnc"
 RESTRICT="!test? ( test )"
 
@@ -199,7 +199,7 @@ REQUIRED_USE="
 
 PATCHES=(
 	# Downloaded patchset
-	"${WORKDIR}"/virtualbox-patches-7.1.0/patches
+	"${WORKDIR}"/virtualbox-patches-7.1.4-r1/patches
 )
 
 pkg_pretend() {

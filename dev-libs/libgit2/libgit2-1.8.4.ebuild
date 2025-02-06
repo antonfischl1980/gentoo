@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -16,7 +16,7 @@ S=${WORKDIR}/${P/_/-}
 
 LICENSE="GPL-2-with-linking-exception"
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS="amd64 arm arm64 ppc ppc64 ~riscv ~s390 sparc x86"
+KEYWORDS="amd64 arm arm64 ~loong ~mips ppc ppc64 ~riscv ~s390 sparc x86"
 IUSE="examples gssapi +ssh test +threads trace"
 RESTRICT="!test? ( test )"
 
@@ -35,6 +35,13 @@ BDEPEND="
 	${PYTHON_DEPS}
 	virtual/pkgconfig
 "
+
+src_prepare() {
+	cmake_src_prepare
+
+	# https://bugs.gentoo.org/948941
+	sed -i -e 's:-Werror::' tests/headertest/CMakeLists.txt || die
+}
 
 src_configure() {
 	local mycmakeargs=(

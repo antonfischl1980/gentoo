@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -33,7 +33,7 @@ SRC_URI="
 
 LICENSE="GPL-2+ SGI-B-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~ppc64 ~riscv ~x86"
+KEYWORDS="amd64 ppc64 ~riscv ~x86"
 IUSE="debug deep-sky doc gps +lens-distortion libcxx media nls qt6 +scripting +show-my-sky stars telescope test webengine +xlsx"
 
 # Python interpreter is used while building RemoteControl plugin
@@ -65,7 +65,7 @@ RDEPEND="
 		dev-qt/qtgui:5=
 		dev-qt/qtnetwork:5
 		dev-qt/qtwidgets:5
-		>=sci-astronomy/calcmysky-0.3.0:=[qt5]
+		>=sci-astronomy/calcmysky-0.3.0:=[qt5(-)]
 		gps? (
 			dev-qt/qtpositioning:5
 			dev-qt/qtserialport:5
@@ -77,12 +77,12 @@ RDEPEND="
 		scripting? ( dev-qt/qtscript:5 )
 		telescope? ( dev-qt/qtserialport:5 )
 		webengine? ( dev-qt/qtwebengine:5[widgets] )
-		xlsx? ( dev-libs/qxlsx:=[qt5] )
+		xlsx? ( dev-libs/qxlsx:=[qt5(-)] )
 	)
 	qt6? (
 		dev-qt/qtbase:6=[concurrent,gui,network,widgets]
 		dev-qt/qtcharts:6
-		>=sci-astronomy/calcmysky-0.3.0:=[qt6]
+		>=sci-astronomy/calcmysky-0.3.0:=[qt6(+)]
 		gps? (
 			dev-qt/qtpositioning:6
 			dev-qt/qtserialport:6
@@ -93,7 +93,7 @@ RDEPEND="
 		scripting? ( dev-qt/qtdeclarative:6 )
 		telescope? ( dev-qt/qtserialport:6 )
 		webengine? ( dev-qt/qtwebengine:6[widgets] )
-		xlsx? ( dev-libs/qxlsx:=[qt6] )
+		xlsx? ( dev-libs/qxlsx:=[qt6(+)] )
 	)
 "
 DEPEND="${RDEPEND}

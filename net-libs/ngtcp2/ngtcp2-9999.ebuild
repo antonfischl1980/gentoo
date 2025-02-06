@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -19,18 +19,20 @@ HOMEPAGE="https://github.com/ngtcp2/ngtcp2/"
 LICENSE="MIT"
 SLOT="0/0"
 IUSE="+gnutls openssl +ssl static-libs test"
+# Without static-libs, src_test just won't run any tests and "pass".
 REQUIRED_USE="ssl? ( || ( gnutls openssl ) ) test? ( static-libs )"
 
 BDEPEND="virtual/pkgconfig"
 RDEPEND="
 	ssl? (
-		gnutls? ( >=net-libs/gnutls-3.7.2:0= )
-		openssl? (
-			>=dev-libs/openssl-1.1.1:0=
-		)
-	)"
-DEPEND="${RDEPEND}
-	test? ( >=dev-util/cunit-2.1[${MULTILIB_USEDEP}] )"
+		gnutls? ( >=net-libs/gnutls-3.7.2:=[${MULTILIB_USEDEP}] )
+		openssl? ( >=dev-libs/openssl-1.1.1:=[${MULTILIB_USEDEP}] )
+	)
+"
+DEPEND="
+	${RDEPEND}
+	test? ( >=dev-util/cunit-2.1[${MULTILIB_USEDEP}] )
+"
 RESTRICT="!test? ( test )"
 
 multilib_src_configure() {

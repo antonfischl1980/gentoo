@@ -17,7 +17,7 @@ HOMEPAGE="
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~riscv ~x86"
+KEYWORDS="amd64 ~arm64 ~riscv ~x86"
 IUSE="big-endian"
 
 RDEPEND="
@@ -118,6 +118,12 @@ python_test() {
 			'xarray/tests/test_dtypes.py::test_maybe_promote[Q-expected20]'
 			'xarray/tests/test_conventions.py::TestCFEncodedDataStore::test_roundtrip_mask_and_scale[dtype0-create_unsigned_masked_scaled_data-create_encoded_unsigned_masked_scaled_data]'
 			'xarray/tests/test_conventions.py::TestCFEncodedDataStore::test_roundtrip_mask_and_scale[dtype1-create_unsigned_masked_scaled_data-create_encoded_unsigned_masked_scaled_data]'
+		)
+	fi
+
+	if ! has_version "dev-python/seaborn[${PYTHON_USEDEP}]"; then
+		EPYTEST_DESELECT+=(
+			xarray/tests/test_plot.py::TestContour::test_colors
 		)
 	fi
 

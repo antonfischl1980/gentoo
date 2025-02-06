@@ -15,7 +15,7 @@ else
 	SRC_URI="https://github.com/hyprwm/${PN^}/releases/download/v${PV}/source-v${PV}.tar.gz -> ${P}.gh.tar.gz"
 	S="${WORKDIR}/${PN}-source"
 
-	KEYWORDS="~amd64"
+	KEYWORDS="amd64"
 fi
 
 LICENSE="BSD"
@@ -62,7 +62,7 @@ DEPEND="
 	>=gui-libs/hyprutils-0.2.3
 "
 BDEPEND="
-	|| ( >=sys-devel/gcc-14:* >=sys-devel/clang-18:* )
+	|| ( >=sys-devel/gcc-14:* >=llvm-core/clang-18:* )
 	app-misc/jq
 	dev-build/cmake
 	>=dev-util/hyprwayland-scanner-0.3.10
@@ -77,8 +77,8 @@ pkg_setup() {
 		eerror "Please upgrade GCC: emerge -v1 sys-devel/gcc"
 		die "GCC version is too old to compile Hyprland!"
 	elif tc-is-clang && ver_test $(clang-version) -lt 18 ; then
-		eerror "Hyprland requires >=sys-devel/clang-18 to build"
-		eerror "Please upgrade Clang: emerge -v1 sys-devel/clang"
+		eerror "Hyprland requires >=llvm-core/clang-18 to build"
+		eerror "Please upgrade Clang: emerge -v1 llvm-core/clang"
 		die "Clang version is too old to compile Hyprland!"
 	fi
 }

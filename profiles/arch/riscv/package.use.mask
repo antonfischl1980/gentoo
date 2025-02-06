@@ -1,4 +1,4 @@
-# Copyright 2019-2024 Gentoo Authors
+# Copyright 2019-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # Alexey Shvetsov <alexxy@gentoo.org> (2024-11-21)
@@ -8,10 +8,6 @@ sci-chemistry/gromacs nnpot
 # Benda Xu <heroxbd@gentoo.org> (2024-10-10)
 # dev-util/nvidia-cuda-toolkit or sys-cluster/ucx are not keyworded on riscv
 sys-cluster/slurm nvml ucx
-
-# David Roman <davidroman96@gmail.com> (2024-10-04)
-# dev-libs/libunibreak not keyworded here
-media-libs/libass libunibreak
 
 # Paul Zander <negril.nx+gentoo@gmail.com> (2024-09-08)
 # needs re-keywording and clean-up of media-libs/opencollada
@@ -28,13 +24,6 @@ sci-mathematics/maxima vtk
 # remain masked for consumers.
 sci-libs/fplll qd
 sci-mathematics/lcalc double-double quad-double
-
-# Andreas Sturmlechner <asturm@gentoo.org> (2024-07-01)
-# USE="kf6compat,kaccounts" depends on kde-frameworks/purpose:6[webengine]
-# which is package.use.mask'ed on these arches. We cannot mask the
-# combination specifically but in reality kaccounts is useless without
-# additional dev-qt/qtwebengine revdeps.
-kde-frameworks/purpose:5 kaccounts
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2024-06-15)
 # Requires unkeyworded dev-qt/qtwebengine (and revdeps)
@@ -71,7 +60,8 @@ sys-apps/openrc-navi s6
 
 # Nowa Ammerlaan <nowa@gentoo.org> (2023-08-30)
 # Avoid keywording more Qt stuff
-dev-python/pyside2 datavis
+dev-python/pyside httpserver remoteobjects
+dev-python/qtpy remoteobjects
 
 # Marek Szuba <marecki@gentoo.org> (2023-08-19)
 # dev-libs/pocl needs some work before it can be keyworded here (Bug #907333).
@@ -97,9 +87,9 @@ sys-block/tgt rbd
 
 # jinqiang zhang <peeweep@0x0.ee> (2023-03-27)
 # Sanitizers supported on riscv64.
-sys-libs/compiler-rt-sanitizers -asan -lsan
->=sys-libs/compiler-rt-sanitizers-19 -libfuzzer -hwasan -profile -tsan
->=sys-libs/compiler-rt-sanitizers-19 -ubsan -scudo
+llvm-runtimes/compiler-rt-sanitizers -asan -lsan
+>=llvm-runtimes/compiler-rt-sanitizers-19 -libfuzzer -hwasan -profile -tsan
+>=llvm-runtimes/compiler-rt-sanitizers-19 -ubsan -scudo
 
 # Yixun Lan <dlan@gentoo.org> (2023-02-16)
 # USE=java depend on virtual/jdk:1.8 which is not support on RISC-V
@@ -112,10 +102,6 @@ app-editors/neovim lua_single_target_luajit
 # Yixun Lan <dlan@gentoo.org> (2022-11-24)
 # depend on dev-libs/libpcre2[jit] which not supported yet, bug #879511
 www-servers/varnish jit
-
-# Xin Yang <yangmame@icloud.com> (2022-10-18)
-# requires qtwebengine, bug #876301
-app-i18n/fcitx-libpinyin dictionary-manager
 
 # Yixun Lan <dlan@gentoo.org> (2022-01-27)
 # This target supports ASAN/etc...

@@ -1,18 +1,19 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 CMAKE_REMOVE_MODULES_LIST=( FindFreetype )
 LUA_COMPAT=( luajit )
+# For the time being upstream supports up to Python 3.12 only.
+# Any issues found with 3.13 should be reported as a Gentoo bug.
 PYTHON_COMPAT=( python3_{10..13} )
 
 inherit cmake flag-o-matic lua-single optfeature python-single-r1 xdg
 
-CEF_DIR="cef_binary_5060_linux_x86_64"
-CEF_REVISION="_v3"
-OBS_BROWSER_COMMIT="be9f1b646406d2250b402581b043f1558042d7f0"
-OBS_WEBSOCKET_COMMIT="0548c7798a323fe5296c150e13b898a5ee62fc1e"
+CEF_VERSION="cef_binary_6533_linux_x86_64"
+OBS_BROWSER_COMMIT="a76b4d8810a0a33e91ac5b76a0b1af2f22bf8efd"
+OBS_WEBSOCKET_COMMIT="eed8a49933786383d11f4868a4e5604a9ee303c6"
 
 DESCRIPTION="Software for Recording and Streaming Live Video Content"
 HOMEPAGE="https://obsproject.com"
@@ -36,7 +37,7 @@ else
 	KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 fi
 
-SRC_URI+=" browser? ( https://cdn-fastly.obsproject.com/downloads/${CEF_DIR}${CEF_REVISION}.tar.xz )"
+SRC_URI+=" browser? ( https://cdn-fastly.obsproject.com/downloads/${CEF_VERSION}.tar.xz )"
 
 LICENSE="Boost-1.0 GPL-2+ MIT Unlicense"
 SLOT="0"
@@ -66,9 +67,9 @@ DEPEND="
 	media-libs/libva
 	media-libs/rnnoise
 	media-libs/x264:=
-	media-video/ffmpeg:=[nvenc?,opus,x264]
+	>=media-video/ffmpeg-6.1:=[nvenc?,opus,x264]
 	net-misc/curl
-	net-libs/mbedtls:=
+	net-libs/mbedtls:0=
 	sys-apps/dbus
 	sys-apps/pciutils
 	sys-apps/util-linux
@@ -140,8 +141,14 @@ DEPEND="
 		dev-libs/qr-code-generator
 	)
 "
-RDEPEND="${DEPEND}
-	qsv? ( media-libs/intel-mediasdk )
+RDEPEND="
+	${DEPEND}
+	qsv? (
+		|| (
+			media-libs/intel-mediasdk
+			media-libs/vpl-gpu-rt
+		)
+	)
 "
 
 QA_PREBUILT="
@@ -192,7 +199,7 @@ src_prepare() {
 src_configure() {
 	local libdir=$(get_libdir)
 	local mycmakeargs=(
-		$(usev browser -DCEF_ROOT_DIR=../${CEF_DIR})
+		$(usev browser -DCEF_ROOT_DIR=../${CEF_VERSION})
 		-DENABLE_ALSA=$(usex alsa)
 		-DENABLE_AJA=OFF
 		-DENABLE_BROWSER=$(usex browser)
@@ -248,8 +255,8 @@ src_install() {
 	cmake_src_install
 
 	# external plugins may need some things not installed by default, install them here
-	insinto /usr/include/obs/UI/obs-frontend-api
-	doins UI/obs-frontend-api/obs-frontend-api.h
+	insinto /usr/include/obs/frontend/api
+	doins frontend/api/obs-frontend-api.h
 }
 
 pkg_postinst() {

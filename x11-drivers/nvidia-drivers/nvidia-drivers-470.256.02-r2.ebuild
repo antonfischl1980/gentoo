@@ -1,11 +1,11 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 MODULES_OPTIONAL_IUSE=+modules
-inherit desktop flag-o-matic linux-mod-r1 multilib readme.gentoo-r1
-inherit systemd toolchain-funcs unpacker user-info
+inherit desktop eapi9-pipestatus flag-o-matic linux-mod-r1 multilib
+inherit readme.gentoo-r1 systemd toolchain-funcs unpacker user-info
 
 MODULES_KERNEL_MAX=6.6
 NV_URI="https://download.nvidia.com/XFree86/"
@@ -169,8 +169,7 @@ src_compile() {
 	)
 
 	# temporary workaround for bug #914468
-	use modules &&
-		CPP="${KERNEL_CC} -E" tc-is-clang && addpredict "${KV_OUT_DIR}"
+	use modules && addpredict "${KV_OUT_DIR}"
 
 	linux-mod-r1_src_compile
 	emake "${NV_ARGS[@]}" -C nvidia-modprobe
@@ -312,7 +311,8 @@ documentation that is installed alongside this README."
 
 		case ${m[2]} in
 			MANPAGE)
-				gzip -dc ${m[0]} | newman - ${m[0]%.gz}; assert
+				gzip -dc ${m[0]} | newman - ${m[0]%.gz}
+				pipestatus || die
 				continue
 			;;
 			VDPAU_SYMLINK) m[4]=vdpau/; m[5]=${m[5]#vdpau/};; # .so to vdpau/
@@ -475,52 +475,12 @@ pkg_postinst() {
 		ewarn "[2] https://wiki.gentoo.org/wiki/Nouveau"
 	fi
 
-	# these can be removed after some time, only to help the transition
-	# given users are unlikely to do further custom solutions if it works
-	# (see also https://github.com/elogind/elogind/issues/272)
-	if grep -riq "^[^#]*HandleNvidiaSleep=yes" "${EROOT}"/etc/elogind/sleep.conf.d/ 2>/dev/null
-	then
-		ewarn
-		ewarn "!!! WARNING !!!"
-		ewarn "Detected HandleNvidiaSleep=yes in ${EROOT}/etc/elogind/sleep.conf.d/."
-		ewarn "This 'could' cause issues if used in combination with the new hook"
-		ewarn "installed by the ebuild to handle sleep using the official upstream"
-		ewarn "script. It is recommended to disable the option."
-	fi
-	if [[ $(realpath "${EROOT}"{/etc,{/usr,}/lib*}/elogind/system-sleep 2>/dev/null | \
-		sort | uniq | xargs -d'\n' grep -Ril nvidia 2>/dev/null | wc -l) -gt 2 ]]
-	then
-		ewarn
-		ewarn "!!! WARNING !!!"
-		ewarn "Detected a custom script at ${EROOT}{/etc,{/usr,}/lib*}/elogind/system-sleep"
-		ewarn "referencing NVIDIA. This version of ${PN} has installed its own"
-		ewarn "hook at ${EROOT}/usr/lib/elogind/system-sleep/nvidia and it is recommended"
-		ewarn "to remove the custom one to avoid potential issues."
-		ewarn
-		ewarn "Feel free to ignore this warning if you know the other NVIDIA-related"
-		ewarn "scripts can be used together. The warning will be removed in the future."
-	fi
-	if [[ ${REPLACING_VERSIONS##* } ]] &&
-		ver_test ${REPLACING_VERSIONS##* } -lt 470.256.02-r1 # may get repeated
-	then
-		elog
-		elog "For suspend/sleep, 'NVreg_PreserveVideoMemoryAllocations=1' is now default"
-		elog "with this version of ${PN}. This is recommended (or required) by"
-		elog "major DEs especially with wayland but, *if* experience regressions with"
-		elog "suspend, try reverting to =0 in '${EROOT}/etc/modprobe.d/nvidia.conf'."
-		elog
-		elog "May notably be an issue when using neither systemd nor elogind to suspend."
-		elog
-		elog "Also, the systemd suspend/hibernate/resume services are now enabled by"
-		elog "default, and for openrc+elogind a similar hook has been installed."
-	fi
-
 	ewarn
 	ewarn "Be warned/reminded that the 470.xx branch reached end-of-life and"
 	ewarn "NVIDIA is no longer fixing issues (including security). Free to keep"
 	ewarn "using (for now) but it is recommended to either switch to nouveau or"
 	ewarn "replace hardware. Will be kept in-tree while possible, but expect it"
-	ewarn "to be removed likely in early 2027 or earlier if major issues arise."
+	ewarn "to be removed likely in late 2027 or earlier if major issues arise."
 	ewarn
 	ewarn "Note that there is no plans to patch in support for kernels branches"
 	ewarn "newer than 6.6.x which will be supported upstream until December 2026."

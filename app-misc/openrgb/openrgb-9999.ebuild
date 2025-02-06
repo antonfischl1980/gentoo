@@ -1,4 +1,4 @@
-# Copyright 2020-2024 Gentoo Authors
+# Copyright 2020-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -28,7 +28,7 @@ RDEPEND="
 	dev-qt/qtcore:5
 	dev-qt/qtgui:5
 	dev-qt/qtwidgets:5
-	net-libs/mbedtls:=
+	net-libs/mbedtls:0=
 	virtual/libusb:1
 "
 DEPEND="
@@ -52,6 +52,9 @@ src_prepare() {
 	default
 	rm -r dependencies/{httplib,hidapi,libusb,mdns,json,mbedtls}* \
 		|| die "Failed to remove unneded deps"
+
+	rm dependencies/hueplusplus-1.1.0/include/json/json.hpp || die
+	echo "#include <nlohmann/json.hpp>" > dependencies/hueplusplus-1.1.0/include/json/json.hpp || die
 }
 
 src_configure() {
