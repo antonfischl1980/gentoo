@@ -3,17 +3,18 @@
 
 EAPI=8
 
-inherit meson
+PYTHON_COMPAT=( python3_{11..14} )
+inherit meson python-any-r1
 
 if [[ ${PV} == "9999" ]] ; then
-	EGIT_REPO_URI="https://anongit.freedesktop.org/git/virglrenderer.git"
+	EGIT_REPO_URI="https://gitlab.freedesktop.org/virgl/virglrenderer.git"
 	inherit git-r3
 else
 	MY_P="${PN}-${P}"
 	SRC_URI="https://gitlab.freedesktop.org/virgl/${PN}/-/archive/${P}/${MY_P}.tar.bz2"
 	S="${WORKDIR}/${MY_P}"
 
-	KEYWORDS="~amd64 ~arm64 ~loong ~riscv ~x86"
+	KEYWORDS="amd64 ~arm64 ~loong ~riscv x86"
 fi
 
 DESCRIPTION="Library used implement a virtual 3D GPU used by qemu"
@@ -36,6 +37,12 @@ DEPEND="
 	${RDEPEND}
 	sys-kernel/linux-headers
 "
+BDEPEND="
+	${PYTHON_DEPS}
+	$(python_gen_any_dep "
+		dev-python/pyyaml[\${PYTHON_USEDEP}]
+	")
+"
 
 PATCHES=(
 	# ALready in main, can be dropped in newer versions
@@ -43,6 +50,10 @@ PATCHES=(
 	# bug 961270
 	"${FILESDIR}/${PN}-fix-clang-warning-about-typeof.patch"
 )
+
+python_check_deps() {
+	python_has_version -b "dev-python/pyyaml[${PYTHON_USEDEP}]" || return 1
+}
 
 src_configure() {
 	local -a gpus=()

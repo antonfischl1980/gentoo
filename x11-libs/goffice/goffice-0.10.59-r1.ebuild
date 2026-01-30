@@ -10,7 +10,7 @@ HOMEPAGE="https://gitlab.gnome.org/GNOME/goffice/"
 
 LICENSE="GPL-2"
 SLOT="0.10"
-KEYWORDS="~alpha amd64 ~arm ~arm64 ~mips ppc ppc64 ~riscv ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~mips ppc ppc64 ~riscv ~sparc ~x86 ~x64-solaris"
 IUSE="+introspection"
 
 # FIXME: add lasem to tree
@@ -28,7 +28,7 @@ RDEPEND="
 	x11-libs/libXext:=
 	x11-libs/libXrender:=
 	introspection? (
-		>=dev-libs/gobject-introspection-1:=
+		>=dev-libs/gobject-introspection-1.82.0-r2:=
 		>=gnome-extra/libgsf-1.14.23:=
 	)"
 DEPEND="${RDEPEND}"

@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -25,7 +25,7 @@ S="${WORKDIR}/mysql"
 LICENSE="GPL-2"
 SLOT="8.0"
 # -ppc for bug #761715
-KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~mips -ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-macos ~x64-solaris"
+KEYWORDS="amd64 arm arm64 ~hppa ~mips -ppc ppc64 ~riscv ~s390 ~sparc x86 ~x64-macos ~x64-solaris"
 IUSE="cjk cracklib debug jemalloc latin1 numa +perl profiling router selinux +server tcmalloc test test-install"
 RESTRICT="!test? ( test )"
 
@@ -48,7 +48,7 @@ COMMON_DEPEND="
 	>=app-arch/zstd-1.2.0:=
 	>=dev-libs/openssl-1.0.0:=
 	sys-libs/ncurses:=
-	>=sys-libs/zlib-1.2.13:=
+	>=virtual/zlib-1.2.13:=
 	server? (
 		dev-libs/icu:=
 		dev-libs/libevent:=[ssl,threads(+)]
@@ -119,6 +119,8 @@ PATCHES=(
 	"${FILESDIR}"/mysql-8.0.37-fix-bundled-boost.patch
 	# Needed due to bundled abseil-cpp-20230802, this fix is included in abseil-cpp-20240722
 	"${FILESDIR}"/mysql-8.0.37-fix-bundled-abseil.patch
+	# for 8.0.43 only
+	"${FILESDIR}"/mysql-8.0.43-fix-clang-20-allocator.patch
 )
 
 mysql_init_vars() {
@@ -500,6 +502,15 @@ src_test() {
 
 		"main.keyring_migration_password;0;Known test failure -- no upstream bug yet"
 		"innodb.upgrade_orphan;0;Known test failure -- no upstream bug yet"
+
+		# Updated in newer versions
+		# https://github.com/mysql/mysql-server/commit/269f4ef1e091c7a4404450f97c5ae1845443eb25
+		"auth_sec.admin_channel_tls;0;Certificate expired"
+		"auth_sec.admin_channel_tls_startup;0;Certificate expired"
+		"auth_sec.cert_verify;0;Certificate expired"
+		"auth_sec.cert_verify_openssl;0;Certificate expired"
+		"x.mysqlxtest_mode_ssl;0;Certificate expired"
+		"x.mysqlxtest_mode_ssl_unixsocket;0;Certificate expired"
 	)
 
 	if ! hash zip 1>/dev/null 2>&1 ; then

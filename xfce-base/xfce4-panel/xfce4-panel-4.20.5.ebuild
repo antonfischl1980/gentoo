@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -14,7 +14,7 @@ SRC_URI="https://archive.xfce.org/src/xfce/${PN}/${PV%.*}/${P}.tar.bz2"
 
 LICENSE="GPL-2+ LGPL-2.1+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~sparc ~x86"
+KEYWORDS="amd64 arm arm64 ~hppa ~loong ~mips ppc ppc64 ~riscv ~sparc x86"
 IUSE="+dbusmenu introspection vala wayland X"
 REQUIRED_USE="
 	|| ( wayland X )
@@ -32,7 +32,7 @@ DEPEND="
 	>=xfce-base/libxfce4windowing-4.20.1:=[X?]
 	>=xfce-base/xfconf-4.18.0:=
 	dbusmenu? ( >=dev-libs/libdbusmenu-16.04.0[gtk3] )
-	introspection? ( >=dev-libs/gobject-introspection-1.66:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	wayland? (
 		>=dev-libs/wayland-1.20
 		>=gui-libs/gtk-layer-shell-0.7.0
@@ -50,7 +50,7 @@ BDEPEND="
 	vala? ( $(vala_depend) )
 	dev-build/xfce4-dev-tools
 	dev-lang/perl
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/intltool
 	sys-devel/gettext
 	virtual/pkgconfig

@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -47,7 +47,7 @@ COMMON_DEPEND="
 	net-libs/libndp
 	systemd? ( >=sys-apps/systemd-209:0= )
 	>=dev-libs/glib-2.42:2[${MULTILIB_USEDEP}]
-	introspection? ( >=dev-libs/gobject-introspection-0.10.3:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	selinux? (
 		sec-policy/selinux-networkmanager
 		sys-libs/libselinux
@@ -108,7 +108,7 @@ DEPEND="${COMMON_DEPEND}
 	test? ( >=dev-libs/jansson-2.7 )
 "
 BDEPEND="
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	gtk-doc? (
 		dev-util/gtk-doc

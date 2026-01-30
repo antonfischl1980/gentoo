@@ -11,7 +11,7 @@ SRC_URI="https://github.com/${PN}/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE="a52 +aac alsa +dbus dca +flac jack libsamplerate +mad nls +opengl +opus"
 IUSE+=" +pulseaudio sndio stream tremor +vorbis"
 REQUIRED_USE="?? ( tremor vorbis )"
@@ -46,7 +46,7 @@ RDEPEND="
 	sndio? ( media-sound/sndio:= )
 	stream? (
 		dev-libs/libgcrypt:=
-		sys-libs/zlib
+		virtual/zlib:=
 	)
 	tremor? (
 		media-libs/libogg

@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -22,7 +22,7 @@ RESTRICT="!test? ( test )"
 DEPEND="
 	>=dev-libs/glib-2.66:2
 	sys-apps/dbus:=
-	introspection? ( dev-libs/gobject-introspection:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	policykit? ( >=sys-auth/polkit-103 )
 	kernel_linux? (
 		>=dev-libs/libgudev-238:=
@@ -39,7 +39,7 @@ RDEPEND="${DEPEND}
 BDEPEND="
 	app-text/docbook-xsl-stylesheets
 	dev-libs/libxslt
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
 	doc? ( dev-util/gtk-doc )

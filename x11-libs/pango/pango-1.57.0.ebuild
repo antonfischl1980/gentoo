@@ -11,7 +11,7 @@ SRC_URI="https://download.gnome.org/sources/pango/$(ver_cut 1-2)/${P}.tar.xz"
 
 LICENSE="LGPL-2+"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ~m68k ~mips ppc ppc64 ~riscv ~s390 ~sparc x86"
 
 IUSE="debug examples gtk-doc +introspection sysprof test X"
 REQUIRED_USE="gtk-doc? ( introspection )"
@@ -39,7 +39,12 @@ BDEPEND="
 	dev-util/glib-utils
 	virtual/pkgconfig
 	dev-python/docutils
-	gtk-doc? ( dev-util/gi-docgen )
+	gtk-doc? (
+		introspection? (
+			>=dev-libs/gobject-introspection-1.83.2
+			dev-util/gi-docgen
+		)
+	)
 	test? ( media-fonts/cantarell )
 "
 
@@ -69,7 +74,7 @@ multilib_src_configure() {
 		# Never use gi-docgen subproject
 		--wrap-mode nofallback
 
-		$(meson_use gtk-doc documentation)
+		$(meson_native_use_bool gtk-doc documentation)
 		$(meson_native_use_feature introspection)
 		-Dman-pages=true
 		$(meson_use test build-testsuite)

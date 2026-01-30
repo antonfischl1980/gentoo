@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -23,7 +23,7 @@ DEPEND="
 	>=gnome-extra/evolution-data-server-3.46.0:=
 	>=app-crypt/gcr-3.90.0:4=[introspection]
 	>=dev-libs/glib-2.68:2
-	>=dev-libs/gobject-introspection-1.49.1:=
+	>=dev-libs/gobject-introspection-1.82.0-r2:=
 	>=dev-libs/gjs-1.73.1[cairo(+)]
 	>=gui-libs/gtk-4:4[X?,introspection,wayland?]
 	>=x11-wm/mutter-47.0:0/15[introspection,test?]
@@ -116,7 +116,7 @@ PDEPEND="
 "
 BDEPEND="
 	dev-libs/libxslt
-	>=dev-util/gdbus-codegen-2.45.3
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	gtk-doc? ( >=dev-util/gtk-doc-1.17
 		>=dev-util/gi-docgen-2021.1

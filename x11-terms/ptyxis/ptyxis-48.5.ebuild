@@ -10,7 +10,7 @@ HOMEPAGE="https://gitlab.gnome.org/chergert/ptyxis"
 
 LICENSE="LGPL-3+"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 IUSE="X test"
 RESTRICT="!test? ( test )"
 
@@ -34,6 +34,10 @@ BDEPEND="
 		dev-libs/appstream-glib
 	)
 "
+
+PATCHES=(
+	"${FILESDIR}/make-libc-compat-builds-optional.patch"
+)
 
 src_configure() {
 	use X || append-cflags -DGENTOO_GTK_HIDE_X11

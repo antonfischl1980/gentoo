@@ -12,12 +12,13 @@ SRC_URI="https://github.com/Karlson2k/r8125/releases/download/${PV}/${P}.tar.bz2
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 
 IUSE="down-speed-100 fiber hw-acceleration hw-optim-tx +eee +giga-lite +multi-tx-q ptp +rss s5-keep-mac use-firmware +wol-s5 +wol"
 
 PATCHES=(
 	"${FILESDIR}/${P}-fix-build-with-firmware.patch"
+	"${FILESDIR}/${P}-ptp-linux-6.16.patch" # Gentoo bug 963364
 )
 
 CONFIG_CHECK="~!R8169"

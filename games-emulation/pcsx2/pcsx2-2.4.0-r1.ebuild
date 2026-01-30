@@ -54,7 +54,7 @@ COMMON_DEPEND="
 	net-libs/libpcap
 	net-misc/curl
 	sys-apps/dbus
-	sys-libs/zlib:=
+	virtual/zlib:=
 	virtual/libudev:=
 	x11-libs/libX11
 	x11-libs/libXi
@@ -170,7 +170,7 @@ src_install() {
 }
 
 pkg_postinst() {
-	fcaps -m 0755 cap_net_admin,cap_net_raw=eip usr/bin/pcsx2-qt
+	fcaps cap_net_admin,cap_net_raw=eip usr/bin/pcsx2-qt
 
 	# calls aplay or gst-play/launch-1.0 as fallback
 	# https://github.com/PCSX2/pcsx2/issues/11141

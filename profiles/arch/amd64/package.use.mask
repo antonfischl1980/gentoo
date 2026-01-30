@@ -17,6 +17,39 @@
 
 #--- END OF EXAMPLES ---
 
+# Sam James <sam@gentoo.org> (2025-12-23)
+# sys-process/numactl is available here
+sys-fs/fuse -io-uring
+
+# Mike Gilbert <floppym@gentoo.org> (2025-12-15)
+# arch-specific platform values
+sys-boot/grub -grub_platforms_pc -grub_platforms_xen-32
+
+# Michał Górny <mgorny@gentoo.org> (2025-11-01)
+# app-crypt/sequoia-chameleon-gnupg is keyworded here.
+app-alternatives/gpg -sequoia
+
+# Ionen Wolkens <ionen@gentoo.org> (2025-10-22)
+# dev-lang/deno-bin is keyworded here
+net-misc/yt-dlp -deno
+
+# Paul Zander <negril.nx+gentoo@gmail.com> (2025-06-29)
+# media-libs/libvmaf is keyworded
+media-libs/x265 -vmaf
+
+# Michał Górny <mgorny@gentoo.org> (2025-09-28)
+# Unmask on amd64 for wider testing.
+sci-libs/flexiblas -system-blas
+sci-libs/lapack -flexiblas
+virtual/blas -flexiblas
+virtual/cblas -flexiblas
+virtual/lapack -flexiblas
+virtual/lapacke -flexiblas
+
+# Nicolas PARLANT <nicolas.parlant@parhuet.fr> (2025-09-20)
+# Require dev-libs/libtsm, keyworded here
+>=media-gfx/fbida-2.14_p20241216 -fbcon
+
 # Michał Górny <mgorny@gentoo.org> (2025-09-12)
 # These BLAS/LAPACK providers are keyworded here.
 sci-libs/flexiblas -blis -mkl -openblas
@@ -48,11 +81,6 @@ lxqt-base/lxqt-meta -wayland
 # The COBOL frontend only allows building on a small number of platforms
 # for now until more testing and integration is done.
 sys-devel/gcc -cobol
-
-# Ionen Wolkens <ionen@gentoo.org> (2025-03-10)
-# dev-util/nvidia-cuda-toolkit is keyworded here
-media-video/ffmpeg -npp
-media-video/ffmpeg-compat -npp
 
 # Ionen Wolkens <ionen@gentoo.org> (2025-03-10)
 # Old versions of ffmpeg needing old nv-codec-codecs complicate slots
@@ -463,11 +491,6 @@ app-metrics/collectd -collectd_plugins_mqtt
 # Thomas Deutschmann <whissi@gentoo.org> (2016-08-26)
 # Enable numa support on supported architectures
 dev-db/mysql -numa
-dev-db/percona-server -numa
-
-# Brian Evans <grknight@gentoo.org> (2016-08-23)
-# It's only supported on amd64
-dev-db/percona-server -tokudb -tokudb-backup-plugin
 
 # Brian Evans <grknight@gentoo.org> (2016-08-18)
 # Allow jdbc on this arch
@@ -476,10 +499,6 @@ dev-db/mariadb -jdbc
 # Andrew Savchenko <bircoph@gentoo.org> (2016-08-11)
 # PGO is fixed on amd64
 >=www-client/firefox-48 -pgo
-
-# Mike Gilbert <floppym@gentoo.org> (2016-06-23)
-# This flag only has meaning on amd64
-sys-boot/grub:2 -grub_platforms_xen-32
 
 # Brian Evans <grknight@gentoo.org> (2015-09-14)
 # Unmask new USE flags for mariadb on supported arches

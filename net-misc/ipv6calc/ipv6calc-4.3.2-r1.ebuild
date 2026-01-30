@@ -11,7 +11,7 @@ SRC_URI="https://github.com/pbiering/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~hppa ppc ~ppc64 ~sparc x86 ~amd64-linux ~x86-linux"
+KEYWORDS="~alpha amd64 ~hppa ppc ~ppc64 ~sparc x86"
 IUSE="cgi geoip +openssl"
 
 RDEPEND="
@@ -34,6 +34,7 @@ PATCHES=(
 	# both are merged. to be removed.
 	"${FILESDIR}"/${P}-fix_directcall_ar.patch
 	"${FILESDIR}"/${P}-fix_libs.patch
+	"${FILESDIR}"/${P}-fix_configure.patch
 )
 
 DOCS=( ChangeLog CREDITS README README.MaxMindDB README.GeoIP2 TODO USAGE )

@@ -1,9 +1,9 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..13} )
+PYTHON_COMPAT=( python3_{11..14} )
 VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/botan.asc
 inherit edo dot-a flag-o-matic multiprocessing ninja-utils python-r1 toolchain-funcs verify-sig
 
@@ -17,7 +17,7 @@ S="${WORKDIR}/${MY_P}"
 LICENSE="BSD-2"
 # New major versions are parallel-installable
 SLOT="$(ver_cut 1)/$(ver_cut 1-2)" # soname version
-KEYWORDS="amd64 ~arm arm64 ~hppa ~loong ~ppc ppc64 ~riscv ~s390 ~sparc x86 ~ppc-macos"
+KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~s390 ~sparc x86"
 IUSE="doc boost bzip2 lzma python static-libs sqlite test tools zlib"
 RESTRICT="!test? ( test )"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
@@ -29,7 +29,7 @@ DEPEND="
 	lzma? ( app-arch/xz-utils:= )
 	python? ( ${PYTHON_DEPS} )
 	sqlite? ( dev-db/sqlite:3= )
-	zlib? ( >=sys-libs/zlib-1.2.3:= )
+	zlib? ( >=virtual/zlib-1.2.3:= )
 "
 RDEPEND="
 	${DEPEND}
@@ -39,7 +39,10 @@ BDEPEND="
 	${PYTHON_DEPS}
 	${NINJA_DEPEND}
 	$(python_gen_any_dep '
-		doc? ( dev-python/sphinx[${PYTHON_USEDEP}] )
+		doc? (
+			dev-python/sphinx[${PYTHON_USEDEP}]
+			dev-python/furo[${PYTHON_USEDEP}]
+		)
 	')
 	|| ( >=sys-devel/gcc-11:* >=llvm-core/clang-14:* )
 	verify-sig? ( sec-keys/openpgp-keys-botan )
@@ -49,9 +52,14 @@ BDEPEND="
 # Please see upstream's guidance:
 # https://botan.randombit.net/handbook/packaging.html#minimize-distribution-patches
 
+PATCHES=(
+	"${FILESDIR}"/${PN}-3.9.0-tests-simd.patch
+)
+
 python_check_deps() {
 	use doc || return 0
-	python_has_version "dev-python/sphinx[${PYTHON_USEDEP}]"
+	python_has_version "dev-python/sphinx[${PYTHON_USEDEP}]" &&
+	python_has_version "dev-python/furo[${PYTHON_USEDEP}]"
 }
 
 pkg_pretend() {

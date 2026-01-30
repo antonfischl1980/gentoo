@@ -1,4 +1,4 @@
-# Copyright 2011-2025 Gentoo Authors
+# Copyright 2011-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -22,7 +22,7 @@ CDEPEND="
 	sys-auth/polkit
 	virtual/libcrypt:=
 	elogind? ( >=sys-auth/elogind-229.4 )
-	introspection? ( >=dev-libs/gobject-introspection-0.9.12:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	systemd? ( >=sys-apps/systemd-186:0= )
 "
 DEPEND="${CDEPEND}
@@ -30,7 +30,7 @@ DEPEND="${CDEPEND}
 "
 BDEPEND="
 	dev-libs/libxslt
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	sys-devel/gettext
 	virtual/pkgconfig

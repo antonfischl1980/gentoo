@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{11..13} )
 PYTHON_REQ_USE="sqlite,ssl"
 
 inherit edo toolchain-funcs python-single-r1 qmake-utils verify-sig xdg
@@ -36,7 +36,7 @@ LICENSE="
 	PSF-2
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="amd64 ~arm64"
 IUSE="+font-subsetting ios speech +system-mathjax test +udisks unrar"
 
 RESTRICT="!test? ( test )"
@@ -127,6 +127,7 @@ PATCHES=(
 	# (last commit in 2017)
 	"${FILESDIR}/${PN}-7.0.0-jxr-test.patch"
 	"${FILESDIR}/${PN}-8.9.0-piper.patch"
+	"${FILESDIR}/${PN}-8.9-qt6.10.patch"
 )
 
 src_prepare() {
@@ -223,7 +224,7 @@ src_install() {
 	#    raise ValueError, 'unknown locale: %s' % localename
 	#ValueError: unknown locale: 46
 	export -n LANG LANGUAGE ${!LC_*}
-	export LC_ALL=C.utf8 # bug #709682
+	export LC_ALL=C.UTF-8 # bug #709682
 
 	# Bug #295672 - Avoid sandbox violation in ~/.config by forcing
 	# variables to point to our fake temporary $HOME.

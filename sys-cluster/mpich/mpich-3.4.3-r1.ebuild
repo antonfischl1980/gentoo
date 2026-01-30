@@ -16,7 +16,7 @@ S="${WORKDIR}"/${PN}-${MY_PV}
 
 LICENSE="mpich2"
 SLOT="0"
-KEYWORDS="amd64 ~arm64 ~hppa ~ppc ppc64 ~riscv x86 ~amd64-linux ~x86-linux"
+KEYWORDS="amd64 ~arm64 ~hppa ~ppc ppc64 ~riscv x86"
 IUSE="+cxx doc fortran mpi-threads +romio threads valgrind"
 REQUIRED_USE="mpi-threads? ( threads )"
 
@@ -45,9 +45,9 @@ MULTILIB_WRAPPED_HEADERS=(
 	/usr/include/opa_config.h
 )
 
-#PATCHES=(
-#	"${FILESDIR}"/${PN}-3.3-add-external-libdir-parameter.patch
-#)
+PATCHES=(
+	"${FILESDIR}"/${P}_fix_test_double_serializer.patch
+)
 
 src_prepare() {
 	default

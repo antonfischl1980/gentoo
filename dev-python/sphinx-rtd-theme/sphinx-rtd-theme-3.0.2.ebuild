@@ -4,7 +4,7 @@
 EAPI=8
 
 DISTUTILS_USE_PEP517=setuptools
-PYTHON_COMPAT=( python3_{11..14} )
+PYTHON_COMPAT=( python3_{12..14} )
 
 inherit distutils-r1 pypi
 
@@ -22,11 +22,6 @@ RDEPEND="
 	>=dev-python/docutils-0.18[${PYTHON_USEDEP}]
 	>=dev-python/sphinx-6[${PYTHON_USEDEP}]
 	>=dev-python/sphinxcontrib-jquery-4[${PYTHON_USEDEP}]
-"
-BDEPEND="
-	test? (
-		dev-python/readthedocs-sphinx-ext[${PYTHON_USEDEP}]
-	)
 "
 
 distutils_enable_tests pytest

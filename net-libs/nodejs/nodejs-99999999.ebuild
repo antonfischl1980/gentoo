@@ -4,7 +4,7 @@
 EAPI=8
 
 CONFIG_CHECK="~ADVISE_SYSCALLS"
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{11..14} )
 PYTHON_REQ_USE="threads(+)"
 
 inherit bash-completion-r1 check-reqs flag-o-matic linux-info ninja-utils pax-utils python-any-r1 toolchain-funcs xdg-utils
@@ -20,7 +20,7 @@ if [[ ${PV} == *9999 ]]; then
 else
 	SRC_URI="https://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz"
 	SLOT="0/$(ver_cut 1)"
-	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~amd64-linux ~x64-macos"
+	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~x64-macos"
 	S="${WORKDIR}/node-v${PV}"
 fi
 
@@ -34,13 +34,15 @@ REQUIRED_USE="inspector? ( icu ssl )
 RESTRICT="!test? ( test )"
 
 RDEPEND=">=app-arch/brotli-1.1.0:=
+	>=dev-cpp/ada-3.3.0:=
+	>=dev-cpp/simdutf-7.3.4:=
 	dev-db/sqlite:3
 	>=dev-libs/libuv-1.51.0:=
 	>=dev-libs/simdjson-3.10.1:=
 	>=net-dns/c-ares-1.34.4:=
 	>=net-libs/nghttp2-1.64.0:=
 	>=net-libs/nghttp3-1.7.0:=
-	sys-libs/zlib
+	virtual/zlib:=
 	corepack? ( !sys-apps/yarn )
 	system-icu? ( >=dev-libs/icu-73:= )
 	system-ssl? (
@@ -127,9 +129,7 @@ src_configure() {
 
 	local myconf=(
 		--ninja
-		# ada is not packaged yet
-		# https://github.com/ada-url/ada
-		# --shared-ada
+		--shared-ada
 		--shared-brotli
 		--shared-cares
 		--shared-libuv
@@ -137,9 +137,7 @@ src_configure() {
 		--shared-nghttp3
 		--shared-ngtcp2
 		--shared-simdjson
-		# sindutf is not packaged yet
-		# https://github.com/simdutf/simdutf
-		# --shared-simdutf
+		--shared-simdutf
 		--shared-sqlite
 		--shared-zlib
 	)
@@ -185,8 +183,7 @@ src_configure() {
 }
 
 src_compile() {
-	export NINJA_ARGS=" $(get_NINJAOPTS)"
-	emake -Onone
+	eninja -C out/Release
 }
 
 src_install() {

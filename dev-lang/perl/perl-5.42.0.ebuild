@@ -55,7 +55,7 @@ LICENSE="|| ( Artistic GPL-1+ )"
 SLOT="0/${SUBSLOT}"
 
 if [[ "${PV##*.}" != "9999" ]] && [[ "${PV/rc//}" == "${PV}" ]] ; then
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~arm64-macos ~ppc-macos ~x64-macos ~x64-solaris"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~arm64-macos ~x64-macos ~x64-solaris"
 fi
 
 IUSE="berkdb perl_features_debug doc gdbm perl_features_ithreads minimal perl_features_quadmath"
@@ -64,7 +64,7 @@ RDEPEND="
 	berkdb? ( sys-libs/db:= )
 	gdbm? ( >=sys-libs/gdbm-1.8.3:= )
 	app-arch/bzip2
-	>=sys-libs/zlib-1.2.12
+	>=virtual/zlib-1.2.12:=
 	virtual/libcrypt:=
 "
 DEPEND="${RDEPEND}"
@@ -276,6 +276,8 @@ src_prepare_perlcross() {
 
 	# bug 794463, needs further analysis what is exactly wrong here
 	eapply "${FILESDIR}/perl-5.34.0-crossfit.patch"
+	# bug 959686, rebase via upstream PR (no 5.42.0 release)
+	eapply "${FILESDIR}/perl-5.42.0-cross-rebase.patch"
 
 	# bug 604072
 	MAKEOPTS+=" -j1"

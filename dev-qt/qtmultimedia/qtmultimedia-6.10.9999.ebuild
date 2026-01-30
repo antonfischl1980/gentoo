@@ -90,14 +90,10 @@ CMAKE_SKIP_TESTS=(
 	# fails with offscreen rendering
 	tst_qvideoframecolormanagement
 	tst_qwindowcapturebackend
-	# >=ffmpeg-8 changed SWS_* defines to an enum and this confuses a test-only
-	# assert, should have no negative runtime effect so just skip for now
-	tst_qffmpegvideoencoderutils
 )
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-6.7.3-eigen-ppc-no-vsx.patch
-	"${FILESDIR}"/${PN}-6.8.1-qversionnumber.patch
 )
 
 src_configure() {

@@ -1,6 +1,31 @@
 # Copyright 2019-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Alfred Wingate <parona@protonmail.com> (2025-12-24)
+# media-libs/jasper is not keyworded here
+media-libs/gegl jpeg2k
+
+# Sam James <sam@gentoo.org> (2025-12-18)
+# dev-lang/ada-bootstrap exists here
+>=sys-devel/gcc-11 -ada
+
+# Sam James <sam@gentoo.org> (2025-10-28)
+# Portability issues with dev-libs/apache-arrow (bug #923968).
+sci-libs/gdal parquet
+
+# Paul Zander <negril.nx+gentoo@gmail.com> (2025-06-29)
+# media-libs/libvmaf is keyworded
+media-libs/x265 -vmaf
+
+# Jakov Smolić <jsmolic@gentoo.org> (2025-10-05)
+# These packages are keyworded on riscv
+sci-libs/flexiblas -system-blas
+sci-libs/lapack -flexiblas
+virtual/blas -flexiblas
+virtual/cblas -flexiblas
+virtual/lapack -flexiblas
+virtual/lapacke -flexiblas
+
 # Michał Górny <mgorny@gentoo.org> (2025-09-12)
 # These BLAS/LAPACK providers are keyworded here.
 sci-libs/flexiblas -openblas
@@ -255,6 +280,6 @@ media-libs/opencv vtk
 sci-libs/opencascade vtk
 
 # This doesn't work for (any) riscv yet.
-dev-libs/libpcre2 jit
 dev-libs/libpcre jit
 www-servers/nginx pcre-jit
+www-apache/mod_security jit

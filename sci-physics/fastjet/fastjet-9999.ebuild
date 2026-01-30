@@ -21,13 +21,13 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.com/fastjet/fastjet"
 else
 	SRC_URI="https://fastjet.fr/repo/${P}.tar.gz"
-	KEYWORDS="~amd64 ~x86 ~amd64-linux ~x86-linux"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 LICENSE="GPL-2+"
 SLOT="0"
 IUSE="cgal examples python +plugins"
-REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
+REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} ) examples? ( plugins )"
 
 # cgal is header-only in version 5.4 and up. We need to use the
 # special --enable-cgal-header-only argument to use these versions.

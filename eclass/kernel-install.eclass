@@ -1,4 +1,4 @@
-# Copyright 2020-2025 Gentoo Authors
+# Copyright 2020-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: kernel-install.eclass
@@ -189,7 +189,7 @@ if [[ ${KERNEL_IUSE_GENERIC_UKI} ]]; then
 		["sys-libs/ncurses"]="MIT"
 		["sys-libs/pam"]="|| ( BSD GPL-2 )"
 		["sys-libs/readline"]="GPL-3+"
-		["sys-libs/zlib"]="ZLIB"
+		["virtual/zlib"]="ZLIB"
 		["sys-process/procps"]="GPL-2+ LGPL-2+ LGPL-2.1+"
 		["x11-libs/libdrm"]="MIT"
 		["amd64? ( sys-firmware/intel-microcode )"]="amd64? ( intel-ucode )"
@@ -263,10 +263,15 @@ kernel-install_can_update_symlink() {
 	# strip KV_LOCALVERSION, we want to update the old kernels not using
 	# KV_LOCALVERSION suffix and the new kernels using it
 	symlink_ver=${symlink_ver%${KV_LOCALVERSION}}
+	symlink_ver=${symlink_ver/-p/_p}
+	# strip -p* revision
+	local symlink_ver_no_rev=${symlink_ver%_p[0-9]*}
+	local rev=${symlink_ver#${symlink_ver_no_rev}}
+	rev=${rev#_p}
 
-	# if ${symlink_ver} contains anything but numbers (e.g. an extra
-	# suffix), it's not our kernel, so leave it alone
-	[[ -n ${symlink_ver//[0-9.]/} ]] && return 1
+	# if ${symlink_ver} contained anything but numbers and revision (e.g.
+	# an extra suffix), it's not our kernel, so leave it alone
+	[[ -n ${symlink_ver_no_rev//[0-9.]/} || -n ${rev//[0-9]/} ]] && return 1
 
 	local symlink_pkg=${CATEGORY}/${PN}-${symlink_ver}
 	# if the current target is either being replaced, or still
@@ -477,12 +482,10 @@ kernel-install_test() {
 			;;
 	esac
 
-	if [[ ${KERNEL_IUSE_MODULES_SIGN} ]]; then
-		# If KERNEL_IUSE_MODULES_SIGN, but no IUSE=modules-sign,
-		# then this is gentoo-kernel-bin test phase with signed mods.
-		if ! in_iuse modules-sign || use modules-sign; then
-			qemu_extra_append+=" module.sig_enforce=1"
-		fi
+	# If no IUSE=modules-sign, then this is gentoo-kernel-bin test
+	# phase with signed mods.
+	if ! in_iuse modules-sign || use modules-sign; then
+		qemu_extra_append+=" module.sig_enforce=1"
 	fi
 
 	cat > run.sh <<-EOF || die
@@ -687,7 +690,9 @@ kernel-install_extract_from_uki() {
 		)
 
 		# Check if there was a padding warning
-		if [[ ${sbverify_err} == "warning: data remaining"*": gaps between PE/COFF sections?"* ]]
+		if [[ ${?} -eq 0 ]]; then
+			sbverify_err=
+		elif [[ ${sbverify_err} == "warning: data remaining"*": gaps between PE/COFF sections?"* ]]
 		then
 			# https://github.com/systemd/systemd/issues/35851
 			local proper_size=${sbverify_err#"warning: data remaining["}
@@ -728,10 +733,19 @@ kernel-install_install_all() {
 	local dir_ver=${1}
 	local kernel_dir=${EROOT}/usr/src/linux-${dir_ver}
 	local relfile=${kernel_dir}/include/config/kernel.release
+	local kernel_cert=${kernel_dir}/certs/signing_key.x509
 	local image_path=$(dist-kernel_get_image_path)
 	local image_dir=${image_path%/*}
 	local module_ver
 	module_ver=$(<"${relfile}") || die
+
+	if [[ ! -r ${SECUREBOOT_SIGN_CERT} && -s ${kernel_cert} ]]; then
+		openssl x509 \
+			-inform DER -in "${kernel_cert}" \
+			-outform PEM -out "${T}/cert.pem" ||
+				die "Failed to convert kernel certificate to PEM format"
+			export SECUREBOOT_SIGN_CERT=${T}/cert.pem
+	fi
 
 	if [[ ${KERNEL_IUSE_GENERIC_UKI} ]]; then
 		if use generic-uki; then

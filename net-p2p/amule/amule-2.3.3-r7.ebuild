@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -13,7 +13,7 @@ else
 	MY_P="${PN/m/M}-${PV}"
 	SRC_URI="https://download.sourceforge.net/${PN}/${MY_P}.tar.xz"
 	S="${WORKDIR}/${MY_P}"
-	KEYWORDS="~alpha amd64 ~arm ~mips ~ppc ppc64 ~riscv ~sparc x86"
+	KEYWORDS="~alpha amd64 ~arm ~mips ppc ppc64 ~riscv ~sparc x86"
 fi
 
 DESCRIPTION="aMule, the all-platform eMule p2p client"
@@ -28,7 +28,7 @@ RDEPEND="
 	dev-libs/crypto++:=
 	sys-libs/binutils-libs:0=
 	sys-libs/readline:0=
-	sys-libs/zlib
+	virtual/zlib:=
 	x11-libs/wxGTK:${WX_GTK_VER}=
 	daemon? ( acct-user/amule )
 	geoip? ( dev-libs/geoip )
@@ -58,6 +58,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-2.3.3-wx3.2.patch"
 	"${FILESDIR}/${PN}-2.3.3-use-xdg-open-as-preview-default.patch"
 	"${FILESDIR}/${P}-boost-1.87.patch"
+	"${FILESDIR}/${P}-boost-1.89.patch" # bug 963550
 )
 
 src_prepare() {

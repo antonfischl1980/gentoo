@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -12,7 +12,7 @@ HOMEPAGE="https://gitlab.gnome.org/GNOME/evolution/-/wikis/home https://gitlab.g
 LICENSE="|| ( LGPL-2 LGPL-3 ) CC-BY-SA-3.0 FDL-1.3+ OPENLDAP"
 SLOT="2.0"
 
-KEYWORDS="amd64 ~arm arm64 ~loong ~ppc64 ~riscv ~x86"
+KEYWORDS="amd64 ~arm arm64 ~loong ~ppc64 ~riscv x86"
 
 IUSE="archive +bogofilter geolocation gtk-doc highlight ldap libnotify selinux sound spamassassin spell ssl +weather ytnef"
 
@@ -77,7 +77,7 @@ RDEPEND="${DEPEND}
 "
 BDEPEND="
 	app-text/docbook-xml-dtd:4.1.2
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	dev-util/itstool
 	gtk-doc? ( dev-util/gtk-doc

@@ -6,7 +6,7 @@
 # java@gentoo.org
 # @AUTHOR:
 # Yuan Liao <liaoyuan@gmail.com>
-# @SUPPORTED_EAPIS: 8
+# @SUPPORTED_EAPIS: 8 9
 # @BLURB: Experimental eclass to add support for testing on the JUnit Platform
 # @DESCRIPTION:
 # This eclass runs tests on the JUnit Platform (which is a JUnit 5 sub-project)
@@ -17,8 +17,8 @@
 if [[ ! ${_JUNIT5_ECLASS} ]]; then
 
 case ${EAPI} in
-	8) ;;
-	*) die "${ECLASS}: EAPI ${EAPI} unsupported." ;;
+	8|9) ;;
+	*) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
 inherit java-pkg-simple
@@ -387,8 +387,7 @@ _junit5_src_test_traditional() {
 	if [[ -n ${JAVA_TEST_RUN_ONLY} ]]; then
 		tests_to_run="${JAVA_TEST_RUN_ONLY[@]}"
 	else
-		pushd "${JAVA_TEST_SRC_DIR}" > /dev/null || die
-		tests_to_run=$(find * -type f\
+		tests_to_run=$(find ${JAVA_TEST_SRC_DIR[@]} -type f\
 			\( -name "*Test.java"\
 			-o -name "Test*.java"\
 			-o -name "*Tests.java"\
@@ -397,11 +396,10 @@ _junit5_src_test_traditional() {
 			! -name "*BaseTest*"\
 			! -name "*TestTypes*"\
 			! -name "*TestUtils*"\
-			! -name "*\$*")
+			! -name "*\$*" -printf '%P\n')
 		tests_to_run=${tests_to_run//"${classes}"\/}
 		tests_to_run=${tests_to_run//.java}
 		tests_to_run=${tests_to_run//\//.}
-		popd > /dev/null || die
 
 		# exclude extra test classes, usually corner cases
 		# that the code above cannot handle

@@ -18,7 +18,7 @@ S="${WORKDIR}/${PN}-${TG_OWT_COMMIT}"
 
 LICENSE="BSD"
 SLOT="0/${PV##*pre}"
-KEYWORDS="~amd64 ~arm64 ~loong ~ppc64 ~riscv"
+KEYWORDS="amd64 ~arm64 ~loong ~ppc64 ~riscv"
 IUSE="screencast +X"
 
 # This package's USE flags may change the ABI and require a rebuild of
@@ -71,6 +71,11 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}/tg_owt-0_pre20250515-fix-gcc16.patch"
 	"${FILESDIR}/tg_owt-0_pre20250515-fix-clang20.patch"
+
+	# Bug 964949. Incomplete, regresses abseil-cpp-2025012.
+	"${FILESDIR}/tg_owt-0_pre20250515-nonnull.patch"
+	# Bug 965838. Fixes regression with abseil-cpp-2025012.
+	"${FILESDIR}/tg_owt-0_pre20250515-scope-nonnull.patch"
 )
 
 src_unpack() {

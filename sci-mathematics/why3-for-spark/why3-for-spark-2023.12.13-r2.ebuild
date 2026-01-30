@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -16,12 +16,11 @@ S="${WORKDIR}"/why3-${ID}
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="amd64 ~arm64"
 IUSE="coq doc emacs gtk html hypothesis-selection +ocamlopt sexp zarith zip"
 RESTRICT="strip"
 
 RDEPEND="
-	>=dev-lang/ocaml-4.11:=[ocamlopt?]
 	dev-ml/menhir:=[ocamlopt?]
 	dev-ml/num:=[ocamlopt?]
 	dev-ml/re:=[ocamlopt?]

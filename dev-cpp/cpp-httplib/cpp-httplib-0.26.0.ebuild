@@ -18,7 +18,7 @@ else
 	SRC_URI="https://github.com/yhirose/${PN}/archive/v${PV}.tar.gz
 		-> ${P}.tar.gz"
 
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
+	KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ~mips ppc ppc64 ~riscv ~s390 ~sparc x86"
 fi
 
 LICENSE="MIT"
@@ -35,7 +35,7 @@ RDEPEND="
 		>=dev-libs/openssl-3.0.13:=[${MULTILIB_USEDEP}]
 	)
 	zlib? (
-		sys-libs/zlib[${MULTILIB_USEDEP}]
+		virtual/zlib:=[${MULTILIB_USEDEP}]
 	)
 	zstd? (
 		app-arch/zstd[${MULTILIB_USEDEP}]

@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -26,7 +26,7 @@ RDEPEND="
 	raw? ( media-libs/gexiv2 )
 	>=dev-libs/glib-2.70:2
 	dev-libs/libgudev
-	dev-libs/gobject-introspection
+	>=dev-libs/gobject-introspection-1.82.0-r2
 	cue? ( media-libs/libcue:= )
 	exif? ( >=media-libs/libexif-0.6 )
 	gsf? ( >=gnome-extra/libgsf-1.14.24:= )
@@ -64,7 +64,7 @@ BDEPEND="
 	app-text/asciidoc
 	dev-libs/libxslt
 	dev-util/glib-utils
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 
 	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig

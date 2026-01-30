@@ -15,7 +15,7 @@ SRC_URI="https://telepathy.freedesktop.org/releases/${PN}/${P}.tar.bz2
 
 LICENSE="LGPL-2.1+"
 SLOT="0/3"
-KEYWORDS="~alpha amd64 ~arm arm64 ~ppc ~ppc64 ~riscv ~sparc x86 ~x86-linux"
+KEYWORDS="~alpha amd64 ~arm arm64 ~ppc ~ppc64 ~riscv ~sparc x86"
 IUSE="+introspection"
 
 RDEPEND="
@@ -26,7 +26,7 @@ RDEPEND="
 	dev-libs/libxml2:=
 	dev-libs/libxslt
 	dev-db/sqlite:3
-	introspection? ( >=dev-libs/gobject-introspection-0.9.6 )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2 )
 "
 DEPEND="${RDEPEND}"
 BDEPEND="

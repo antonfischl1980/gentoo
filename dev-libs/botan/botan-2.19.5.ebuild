@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -17,7 +17,7 @@ S="${WORKDIR}/${MY_P}"
 LICENSE="BSD-2"
 # New major versions are parallel-installable
 SLOT="$(ver_cut 1)/$(ver_cut 1-2)" # soname version
-KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86 ~ppc-macos"
+KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86"
 IUSE="doc boost bzip2 lzma python static-libs sqlite test tools zlib"
 CPU_USE=(
 	cpu_flags_arm_{aes,neon}
@@ -35,7 +35,7 @@ DEPEND="
 	lzma? ( app-arch/xz-utils:= )
 	python? ( ${PYTHON_DEPS} )
 	sqlite? ( dev-db/sqlite:3= )
-	zlib? ( >=sys-libs/zlib-1.2.3:= )
+	zlib? ( >=virtual/zlib-1.2.3:= )
 "
 RDEPEND="
 	${DEPEND}
@@ -58,6 +58,7 @@ PATCHES=(
 	"${FILESDIR}"/${P}-boost-1.87.patch
 	"${FILESDIR}"/${P}-cloudflare.patch
 	"${FILESDIR}"/${P}-include.patch
+	"${FILESDIR}"/${P}-boost-1.89.patch # bug 964322
 )
 
 python_check_deps() {
@@ -198,6 +199,11 @@ src_install() {
 	if [[ -d "${ED}"/usr/share/doc/${P} && ${P} != ${PF} ]] ; then
 		# --docdir in configure controls the parent directory unfortunately
 		mv "${ED}"/usr/share/doc/${P} "${ED}"/usr/share/doc/${PF} || die
+	fi
+
+	if [[ -d "${ED}"/usr/share/man/man1 ]] ; then
+		# --program-suffix doesn't apply to the man page
+		mv "${ED}"/usr/share/man/man1/botan{,$(ver_cut 1)}.1 || die
 	fi
 
 	# Manually install the Python bindings (bug #723096)

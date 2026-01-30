@@ -11,7 +11,7 @@ HOMEPAGE="https://gitlab.gnome.org/GNOME/folks"
 
 LICENSE="LGPL-2.1+"
 SLOT="0/26" # subslot = libfolks soname version
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86 ~x86-linux"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
 
 IUSE="bluetooth eds test utils"
 REQUIRED_USE="bluetooth? ( eds )"
@@ -19,7 +19,7 @@ RESTRICT="!test? ( test )"
 
 DEPEND="
 	>=dev-libs/glib-2.58:2
-	>=dev-libs/gobject-introspection-1.54:=
+	>=dev-libs/gobject-introspection-1.82.0-r2:=
 	>=dev-libs/libgee-0.10:0.8[introspection]
 	dev-libs/libxml2:2=
 	eds? ( >=gnome-extra/evolution-data-server-3.38:= )

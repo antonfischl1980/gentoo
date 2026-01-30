@@ -18,14 +18,14 @@ else
 		verify-sig? ( https://github.com/kovidgoyal/kitty/releases/download/v${PV}/${P}.tar.xz.sig )
 	"
 	VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/kovidgoyal.gpg
-	KEYWORDS="~amd64 ~arm64 ~ppc64 ~riscv ~x86"
+	KEYWORDS="~amd64 ~arm64 ~loong ~ppc64 ~riscv ~x86"
 fi
 
 DESCRIPTION="Fast, feature-rich, GPU-based terminal"
 HOMEPAGE="https://sw.kovidgoyal.net/kitty/"
 
 LICENSE="GPL-3 ZLIB"
-LICENSE+=" Apache-2.0 BSD BSD-2 MIT MPL-2.0" # go
+LICENSE+=" Apache-2.0 BSD BSD-2 MIT" # go
 SLOT="0"
 IUSE="+X test wayland"
 REQUIRED_USE="
@@ -47,7 +47,7 @@ RDEPEND="
 	media-libs/libglvnd[X?]
 	media-libs/libpng:=
 	sys-apps/dbus
-	sys-libs/zlib:=
+	virtual/zlib:=
 	x11-libs/cairo
 	x11-libs/libxkbcommon[X?]
 	x11-misc/xkeyboard-config
@@ -76,7 +76,7 @@ DEPEND="
 # bug #919751 wrt go subslot
 BDEPEND="
 	${PYTHON_DEPS}
-	>=dev-lang/go-1.23:=
+	>=dev-lang/go-1.24:=
 	sys-libs/ncurses
 	virtual/pkgconfig
 	test? ( $(python_gen_cond_dep 'dev-python/pillow[zlib,${PYTHON_USEDEP}]') )

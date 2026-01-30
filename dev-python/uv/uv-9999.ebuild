@@ -1,9 +1,9 @@
-# Copyright 2024-2025 Gentoo Authors
+# Copyright 2024-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-RUST_MIN_VER="1.88.0"
+RUST_MIN_VER="1.91.0"
 
 inherit cargo check-reqs git-r3
 
@@ -29,6 +29,7 @@ RDEPEND="
 	${DEPEND}
 "
 BDEPEND="
+	virtual/pkgconfig
 	test? (
 		dev-lang/python:3.9
 		dev-lang/python:3.10
@@ -100,13 +101,6 @@ src_compile() {
 }
 
 src_test() {
-	# work around https://github.com/astral-sh/uv/issues/4376
-	local -x PATH=${BROOT}/usr/lib/python-exec/python3.12:${PATH}
-	local -x COLUMNS=100
-	local -x PYTHONDONTWRITEBYTECODE=
-	# fix tests failing because of our config
-	local -x XDG_CONFIG_DIRS=${T}
-
 	cd crates/uv || die
 	cargo_src_test --no-fail-fast
 }

@@ -17,7 +17,7 @@ SRC_URI="
 
 LICENSE="|| ( GPL-2 GPL-3 ) LGPL-2.1"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~hppa ~loong ~sparc ~x86 ~amd64-linux ~x86-linux ~arm64-macos ~x64-macos"
+KEYWORDS="amd64 arm64 ~hppa ~loong ~sparc ~x86 ~arm64-macos ~x64-macos"
 IUSE="cairo doc icu java jpeg +libdeflate lto minimal nls openmp perl png prefix profile readline test tiff tk X"
 
 REQUIRED_USE="
@@ -38,7 +38,7 @@ DEPEND="
 	dev-libs/libpcre2:=
 	>=dev-libs/tre-0.8.0_p20210321[approx]
 	net-misc/curl
-	sys-libs/zlib[minizip]
+	virtual/minizip:=
 	sys-apps/coreutils
 	sys-libs/timezone-data
 	virtual/blas
@@ -79,6 +79,7 @@ PATCHES=(
 	"${FILESDIR}"/R-4.3.0-parallel.patch
 	"${FILESDIR}"/R-4.3.0-no-LDFLAGS-in-libR-pkg-config.patch
 	"${FILESDIR}"/R-4.3.0-no-gzip-doc.patch
+	"${FILESDIR}"/R-4.5.0-static-initializer.patch  # 4.5.0 only
 )
 
 # false positive, the linking step fails (as it should)
@@ -214,9 +215,17 @@ src_install() {
 		pushd "${ED}"/usr/$(get_libdir)/R >/dev/null || die
 		for mod in $(find . -name "*.dylib") ; do
 			mod=${mod#./}
-			install_name_tool -id "${EPREFIX}/usr/$(get_libdir)/R/${mod}" "${mod}"
+			install_name_tool \
+				-id "${EPREFIX}/usr/$(get_libdir)/R/${mod}" \
+				"${mod}" || die
 		done
 		popd >/dev/null || die
+		# 911553
+		if [[ -f "${ED}/usr/$(get_libdir)/libRmath.dylib" ]] ; then
+			install_name_tool \
+				-id "${EPREFIX}/usr/$(get_libdir)/libRmath.dylib" \
+				"${ED}/usr/$(get_libdir)/libRmath.dylib" || die
+		fi
 	fi
 
 	# Users are encouraged to access some of the the R documentation

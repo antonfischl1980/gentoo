@@ -3,7 +3,7 @@
 
 EAPI=8
 
-ADA_COMPAT=( gcc_{12..15} )
+ADA_COMPAT=( gcc_{12..16} )
 PYTHON_COMPAT=( python3_{11..14} )
 
 inherit ada python-any-r1 multiprocessing
@@ -30,7 +30,7 @@ RESTRICT="test"
 
 RDEPEND="${ADA_DEPS}
 	dev-ada/gprbuild[${ADA_USEDEP}]
-	dev-ada/VSS[${ADA_USEDEP}]"
+	dev-ada/vss-text[${ADA_USEDEP}]"
 DEPEND="${RDEPEND}"
 BDEPEND="test? ( ${PYTHON_DEPS} )"
 

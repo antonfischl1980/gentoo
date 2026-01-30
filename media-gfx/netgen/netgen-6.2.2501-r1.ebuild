@@ -12,7 +12,7 @@ SRC_URI="https://github.com/NGSolve/netgen/archive/refs/tags/v${PV}.tar.gz -> ${
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 ~x86"
 
 IUSE="ffmpeg gui jpeg mpi +opencascade python test"
 RESTRICT="!test? ( test )"
@@ -25,7 +25,7 @@ REQUIRED_USE="
 "
 
 DEPEND="
-	sys-libs/zlib
+	virtual/zlib:=
 	ffmpeg? ( media-video/ffmpeg:= )
 	gui? (
 		dev-lang/tcl:0/8.6

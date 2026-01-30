@@ -1,6 +1,44 @@
 # Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Sam James <sam@gentoo.org> (2025-12-23)
+# sys-process/numactl is not available everywhere
+sys-fs/fuse io-uring
+
+# Mike Gilbert <floppym@gentoo.org (2025-12-15)
+# arch-specific platform values
+sys-boot/grub grub_platforms_loongson grub_platforms_qemu-mips
+sys-boot/grub grub_platforms_pc grub_platforms_xen-32
+
+# Michał Górny <mgorny@gentoo.org> (2025-11-01)
+# app-crypt/sequoia-chameleon-gnupg is not keyworded everywhere.
+app-alternatives/gpg sequoia
+
+# Ionen Wolkens <ionen@gentoo.org> (2025-10-21)
+# Uses dev-lang/deno-bin which offers limited per-arch prebuilts
+# (source build is currently unpackaged and is non-trivial due to v8)
+net-misc/yt-dlp deno
+
+# Paul Zander <negril.nx+gentoo@gmail.com> (2025-06-29)
+# libvmaf has limited keywords
+media-libs/x265 vmaf
+
+# Michał Górny <mgorny@gentoo.org> (2025-09-28)
+# Masked until sci-libs/flexiblas and sci-libs/blas-lapack-aux-wrappers
+# are keyworded everywhere.  And for some more testing.
+sci-libs/flexiblas system-blas
+sci-libs/lapack flexiblas
+virtual/blas flexiblas
+virtual/cblas flexiblas
+virtual/lapack flexiblas
+virtual/lapacke flexiblas
+
+# Sasha Finkelstein <fnkl.kernel@gmail.com> (2025-09-17)
+# Arm64-specific ABI that does not make sense anywhere else
+app-emulation/wine-proton arm64ec
+app-emulation/wine-staging arm64ec
+app-emulation/wine-vanilla arm64ec
+
 # Michał Górny <mgorny@gentoo.org> (2025-09-12)
 # Other BLAS/LAPACK providers are not keyworded everywhere.
 sci-libs/flexiblas blis mkl openblas
@@ -28,11 +66,6 @@ media-gfx/blender oneapi
 # The COBOL frontend only allows building on a small number of platforms
 # for now until more testing and integration is done.
 sys-devel/gcc cobol
-
-# Ionen Wolkens <ionen@gentoo.org> (2025-03-10)
-# dev-util/nvidia-cuda-toolkit has very few keywords
-media-video/ffmpeg npp
-media-video/ffmpeg-compat npp
 
 # Thibaud CANALE <thican@thican.net> (2025-03-09)
 # Too many dependencies are not keyworded (bug 949851)
@@ -150,12 +183,6 @@ sys-kernel/installkernel grub
 # Requires dev-libs/level-zero.
 dev-lang/ispc gpu
 
-# Nowa Ammerlaan <nowa@gentoo.org> (2023-12-18)
-# Experimental and only available on a subset of architectures
-sys-kernel/gentoo-kernel generic-uki
-sys-kernel/gentoo-kernel-bin generic-uki
-sys-kernel/vanilla-kernel generic-uki
-
 # Ionen Wolkens <ionen@gentoo.org> (2023-12-02)
 # dev-qt/qtwebengine:6 and dev-qt/qtremoteobjects:6 have few keywords.
 dev-python/pyqt6 pdfium remoteobjects
@@ -247,10 +274,6 @@ media-libs/libva-intel-driver hybrid
 # want to have the flag enabled without hassle.
 <sys-libs/glibc-2.36 experimental-loong
 sys-libs/libseccomp experimental-loong
-
-# James Le Cuirot <chewi@gentoo.org> (2022-02-24)
-# These GRUB platforms are only for MIPS.
-sys-boot/grub grub_platforms_loongson grub_platforms_qemu-mips
 
 # Adel Kara Slimane <adel.ks@zegrapher.com> (2022-02-17)
 # Mask AMF keyword on non-amd64 arches
@@ -415,19 +438,10 @@ app-metrics/collectd collectd_plugins_mqtt
 # Thomas Deutschmann <whissi@gentoo.org> (2016-08-26)
 # It's only supported on amd64, ia64, powerpc and x86
 dev-db/mysql numa
-dev-db/percona-server numa
-
-# Brian Evans <grknight@gentoo.org> (2016-08-23)
-# It's only supported on amd64
-dev-db/percona-server tokudb tokudb-backup-plugin
 
 # Brian Evans <grknight@gentoo.org> (2016-08-18)
 # Mask jdbc as most arches don't support java
 dev-db/mariadb jdbc
-
-# Mike Gilbert <floppym@gentoo.org> (2016-06-23)
-# This flag only has meaning on amd64
-sys-boot/grub:2 grub_platforms_xen-32
 
 # Alexis Ballier <aballier@gentoo.org> (2015-11-14)
 # MMAL is only available on the Raspberry Pi:
@@ -447,10 +461,6 @@ sys-kernel/installkernel systemd-boot ukify uki
 # Ben de Groot <yngwin@gentoo.org> (2015-03-15)
 # Mask bdplus support and unmask on arches where libbdplus is keyworded.
 media-libs/libbluray bdplus
-
-# Lars Wendler <polynomial-c@gentoo.org> (2014-04-23)
-# Not working on 64bit systems
-media-sound/lmms vst
 
 # Andreas K. Huettel <dilfridge@gentoo.org> (2014-01-04)
 # Mask until dependencies are keyworded (bug 497068)

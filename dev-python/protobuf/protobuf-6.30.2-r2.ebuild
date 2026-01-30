@@ -1,4 +1,4 @@
-# Copyright 2008-2025 Gentoo Authors
+# Copyright 2008-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -28,12 +28,12 @@ SRC_URI="
 
 LICENSE="BSD"
 SLOT="0/$(ver_cut 1-3)"
-KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~sparc ~x86 ~x64-macos"
 
 # need protobuf compiler
 BDEPEND="
 	test? (
-		dev-libs/protobuf
+		dev-libs/protobuf[protoc(+)]
 		dev-python/absl-py[${PYTHON_USEDEP}]
 		dev-python/numpy[${PYTHON_USEDEP}]
 	)

@@ -9,7 +9,7 @@ SRC_URI="https://archive.xfce.org/src/xfce/${PN}/${PV%.*}/${P}.tar.bz2"
 
 LICENSE="LGPL-2.1+"
 SLOT="0/4.19.6"
-KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~sparc ~x86"
+KEYWORDS="amd64 arm arm64 ~hppa ~loong ~mips ppc ppc64 ~riscv ~sparc x86"
 IUSE="+introspection wayland X"
 REQUIRED_USE="|| ( wayland X )"
 
@@ -36,6 +36,7 @@ DEPEND="
 BDEPEND="
 	>=dev-build/xfce4-dev-tools-4.19.2
 	dev-lang/perl
+	dev-util/glib-utils
 	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
 	wayland? (

@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -24,7 +24,7 @@ COMMON_DEPEND="
 	${PYTHON_DEPS}
 	>=app-accessibility/at-spi2-core-2.46.0:2
 	>=dev-libs/glib-2.45.7:2[dbus]
-	>=dev-libs/gobject-introspection-0.9.12:=
+	>=dev-libs/gobject-introspection-1.82.0-r2:=
 	>=dev-libs/json-glib-1.6.0
 	dev-libs/libxmlb:0/2[introspection]
 	>=gnome-extra/cinnamon-desktop-6.4:0=
@@ -68,7 +68,7 @@ DEPEND="
 	x11-base/xorg-proto
 "
 BDEPEND="
-	>=dev-util/gdbus-codegen-2.31.0
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	>=dev-util/intltool-0.40.1
 	sys-devel/gettext
 	virtual/pkgconfig

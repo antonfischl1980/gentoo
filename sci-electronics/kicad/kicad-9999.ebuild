@@ -55,8 +55,10 @@ RESTRICT="!test? ( test )"
 # See https://gitlab.com/kicad/code/kicad/-/commit/74e4370a9b146b21883d6a2d1df46c7a10bd0424
 # Depend on opencascade:0 to get unslotted variant (so we know path to it), bug #833301
 # Depend wxGTK version needs to be limited due to switch from EGL to GLX, bug #911120
+# Depends on abseil-cpp via protobuf targets
 COMMON_DEPEND="
 	app-crypt/libsecret
+	dev-cpp/abseil-cpp:=
 	dev-db/unixODBC
 	dev-libs/boost:=[context,nls]
 	dev-libs/libgit2:=
@@ -71,7 +73,7 @@ COMMON_DEPEND="
 	>=x11-libs/cairo-1.8.8:=
 	>=x11-libs/pixman-0.30
 	>sci-electronics/ngspice-27[shared]
-	sys-libs/zlib
+	virtual/zlib:=
 	x11-libs/wxGTK:${WX_GTK_VER}=[X,opengl]
 	$(python_gen_cond_dep '
 		dev-libs/boost:=[context,nls,python,${PYTHON_USEDEP}]
@@ -140,7 +142,6 @@ src_configure() {
 		-DPYTHON_LIBRARY="$(python_get_library_path)"
 
 		-DKICAD_INSTALL_DEMOS="$(usex examples)"
-		-DCMAKE_SKIP_RPATH="ON"
 
 		-DOCC_INCLUDE_DIR="${CASROOT}"/include/opencascade
 		-DOCC_LIBRARY_DIR="${CASROOT}"/$(get_libdir)/opencascade
@@ -148,6 +149,16 @@ src_configure() {
 		-DKICAD_SPICE_QA="$(usex test)"
 		-DKICAD_BUILD_QA_TESTS="$(usex test)"
 	)
+
+	if ! [[ ${PV} == *9999* ]]; then
+		mycmakeargs+=(
+			-DCMAKE_POLICY_DEFAULT_CMP0167="OLD"
+
+			# 939141
+			-DCMAKE_DISABLE_FIND_PACKAGE_Git="yes"
+			-DKICAD_VERSION="${PVR}"
+		)
+	fi
 
 	cmake_src_configure
 }
@@ -169,9 +180,7 @@ src_test() {
 		qa_cli
 	)
 
-	# LD_LIBRARY_PATH is there to help it pick up the just-built libraries
-	LD_LIBRARY_PATH="${BUILD_DIR}/common:${BUILD_DIR}/common/gal:${BUILD_DIR}/3d-viewer/3d_cache/sg:${LD_LIBRARY_PATH}" \
-		cmake_src_test
+	cmake_src_test
 }
 
 src_install() {

@@ -21,7 +21,7 @@ S=${WORKDIR}/${MY_P}
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64 arm ~arm64 ~riscv ~x86"
+KEYWORDS="amd64 arm ~arm64 ~loong ~ppc ~ppc64 ~riscv x86"
 IUSE="gtk gtk-doc +introspection"
 
 DEPEND="
@@ -33,7 +33,7 @@ DEPEND="
 		>=gui-libs/gtk-layer-shell-0.7.0
 		>=x11-libs/gtk+-3.24:3[wayland]
 	)
-	introspection? ( >=dev-libs/gobject-introspection-1.72.0 )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2 )
 "
 RDEPEND="
 	${DEPEND}

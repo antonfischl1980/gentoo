@@ -1,9 +1,9 @@
-# Copyright 2023-2025 Gentoo Authors
+# Copyright 2023-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 PYTHON_COMPAT=( python3_{11..14} )
-inherit gnome.org gnome2-utils meson optfeature python-any-r1 toolchain-funcs virtualx xdg
+inherit flag-o-matic gnome.org gnome2-utils meson optfeature python-any-r1 toolchain-funcs virtualx xdg
 
 DESCRIPTION="GTK is a multi-platform toolkit for creating graphical user interfaces"
 HOMEPAGE="https://www.gtk.org/ https://gitlab.gnome.org/GNOME/gtk/"
@@ -15,7 +15,7 @@ REQUIRED_USE="
 	gtk-doc? ( introspection )
 	test? ( introspection )
 "
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86"
 IUSE="aqua broadway cloudproviders colord cups examples gstreamer gtk-doc +introspection sysprof test vulkan wayland +X cpu_flags_x86_f16c"
 
 # TODO: Optional gst build dep on >=gst-plugins-base-1.23.1, so depend on it once we can
@@ -46,7 +46,7 @@ COMMON_DEPEND="
 			>=media-libs/gst-plugins-base-1.24.0:1.0[opengl]
 		)
 	)
-	introspection? ( >=dev-libs/gobject-introspection-1.76:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	vulkan? ( >=media-libs/vulkan-loader-1.3:=[wayland?,X?] )
 	wayland? (
 		>=dev-libs/wayland-1.23.0
@@ -94,7 +94,7 @@ BDEPEND="
 	)
 	dev-python/docutils
 	>=dev-libs/glib-2.80
-	>=dev-util/gdbus-codegen-2.48
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	>=sys-devel/gettext-0.19.7
 	virtual/pkgconfig
@@ -148,6 +148,8 @@ src_prepare() {
 }
 
 src_configure() {
+	use x86 && append-flags -DDISABLE_X64=1 #943705 https://gitlab.gnome.org/GNOME/gtk/-/issues/4173
+
 	local emesonargs=(
 		# GDK backends
 		$(meson_use X x11-backend)
@@ -240,11 +242,30 @@ src_test() {
 }
 
 src_install() {
+	local i src
+
 	meson_src_install
 
 	if use gtk-doc; then
-		mkdir -p "${ED}"/usr/share/gtk-doc/html/ || die
-		mv "${ED}"/usr/share/doc/{gtk4,gsk4,gdk4{,-wayland,-x11}} "${ED}"/usr/share/gtk-doc/html/ || die
+		mkdir -p "${ED}/usr/share/gtk-doc/html" || die
+
+		for dir in gdk4 gtk4 gsk4; do
+			src="${ED}/usr/share/doc/${dir}"
+			test -d "${src}" || die "Expected documentation directory ${src} not found"
+			mv -v "${src}" "${ED}/usr/share/gtk-doc/html" || die
+		done
+
+		if use X; then
+			src="${ED}/usr/share/doc/gdk4-x11"
+			test -d "${src}" || die "Expected X11 documentation ${src} not found"
+			mv -v "${src}" "${ED}/usr/share/gtk-doc/html" || die
+		fi
+
+		if use wayland; then
+			src="${ED}/usr/share/doc/gdk4-wayland"
+			test -d "${src}" || die "Expected Wayland documentation ${src} not found"
+			mv -v "${src}" "${ED}/usr/share/gtk-doc/html" || die
+		fi
 	fi
 }
 

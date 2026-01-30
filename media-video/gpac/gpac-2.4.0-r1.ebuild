@@ -18,7 +18,7 @@ IUSE="
 "
 
 RDEPEND="
-	sys-libs/zlib:=
+	virtual/zlib:=
 	X? (
 		x11-libs/libX11
 		x11-libs/libXv
@@ -65,6 +65,7 @@ PATCHES=(
 	"${FILESDIR}"/${P}-configure-stddef.patch
 	"${FILESDIR}"/${P}-ffmpeg6.patch
 	"${FILESDIR}"/${P}-ffmpeg7.patch
+	"${FILESDIR}"/${P}-ffmpeg8.patch
 )
 
 src_prepare() {

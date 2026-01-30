@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -13,7 +13,7 @@ SRC_URI="https://github.com/gluster/glusterfs/archive/refs/tags/v${PV}.tar.gz ->
 
 LICENSE="|| ( GPL-2 LGPL-3+ )"
 SLOT="0/${PV%%.*}"
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
+KEYWORDS="amd64 ~arm arm64 ~loong ~ppc ppc64 ~riscv ~x86"
 
 IUSE="debug emacs +fuse georeplication ipv6 +libtirpc rsyslog selinux static-libs tcmalloc test +uring xml"
 
@@ -26,6 +26,7 @@ RESTRICT="test"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-11.0-extras-defer-invoking-of-gluster-volume-set-help-as-.patch"
+	"${FILESDIR}/${PN}-11.2-sys-types.h-for-off64_t.patch"
 )
 
 # sys-apps/util-linux is required for libuuid

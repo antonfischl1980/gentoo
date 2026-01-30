@@ -61,13 +61,8 @@
 			in addition to FFmpeg's own implementation
 		</flag>
 		<flag name="libsoxr">Enable use of the audio resampler from <pkg>media-libs/soxr</pkg></flag>
-		<flag name="libtesseract">Enable Optical Character Recognition (OCR) filter support via <pkg>app-text/tesseract</pkg></flag>
 		<flag name="lv2">Enable use of filters through <pkg>media-libs/lv2</pkg></flag>
-		<flag name="npp">
-			Enable Nvidia Performance Primitives-based filters via
-			<pkg>dev-util/nvidia-cuda-toolkit</pkg> (warning: if USE=gpl
-			is enabled, this produces non-redistributable build)
-		</flag>
+		<flag name="ocr">Enable Optical Character Recognition (OCR) filter support via <pkg>app-text/tesseract</pkg></flag>
 		<flag name="openh264">Enable H.264 encoding support via <pkg>media-libs/openh264</pkg></flag>
 		<flag name="openmpt">Enable MPTM tracked music files decoding support via <pkg>media-libs/libopenmpt</pkg></flag>
 		<flag name="openssl">
@@ -104,7 +99,6 @@
 			in addition to FFmpeg's own implementation
 		</flag>
 		<flag name="vidstab">Enable video stabilization filter support via <pkg>media-libs/vidstab</pkg></flag>
-		<flag name="vmaf">Enable Netflix's perceptual video quality assessment filter support via <pkg>media-libs/libvmaf</pkg></flag>
 		<flag name="vpx">
 			Enable VP8 and VP9 de/encoding support via <pkg>media-libs/libvpx</pkg>
 			in addition to FFmpeg's own implementation (for decoding only)

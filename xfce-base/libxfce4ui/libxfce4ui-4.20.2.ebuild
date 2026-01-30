@@ -14,7 +14,7 @@ SRC_URI="https://archive.xfce.org/src/xfce/${PN}/${PV%.*}/${P}.tar.bz2"
 
 LICENSE="LGPL-2+ GPL-2+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~sparc ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="amd64 arm arm64 ~hppa ~loong ~mips ppc ppc64 ~riscv ~sparc x86"
 IUSE="glade +introspection startup-notification system-info vala wayland X"
 REQUIRED_USE="
 	|| ( wayland X )
@@ -27,7 +27,7 @@ DEPEND="
 	>=xfce-base/libxfce4util-4.17.2:=[introspection?,vala?]
 	>=xfce-base/xfconf-4.12.0:=
 	glade? ( >=dev-util/glade-3.5.0:3.10 )
-	introspection? ( >=dev-libs/gobject-introspection-1.66:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	system-info? (
 		>=dev-libs/libgudev-232
 		>=gnome-base/libgtop-2.24.0

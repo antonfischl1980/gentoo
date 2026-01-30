@@ -13,8 +13,8 @@ inherit cmake flag-o-matic lua-single optfeature python-single-r1 xdg
 
 CEF_AMD64="cef_binary_6533_linux_x86_64_v6"
 CEF_ARM64="cef_binary_6533_linux_aarch64_v6"
-OBS_BROWSER_COMMIT="c3b1e81a12380cd3d3f2cac65ef50289f144b2b6"
-OBS_WEBSOCKET_COMMIT="40d26dbf4d29137bf88cd393a3031adb04d68bba"
+OBS_BROWSER_COMMIT="a776dd6a1a0ded4a8a723f2f572f3f8a9707f5a8"
+OBS_WEBSOCKET_COMMIT="1c9306b1e200704ebe192e06c893dfc06b097c43"
 
 DESCRIPTION="Software for Recording and Streaming Live Video Content"
 HOMEPAGE="https://obsproject.com"
@@ -83,7 +83,7 @@ DEPEND="
 	sys-apps/dbus
 	sys-apps/pciutils
 	sys-apps/util-linux
-	sys-libs/zlib:=
+	virtual/zlib:=
 	x11-libs/libdrm
 	x11-libs/libX11
 	x11-libs/libxcb:=
@@ -181,6 +181,8 @@ src_unpack() {
 
 src_prepare() {
 	default
+
+	sed -i 's/-Werror //' libobs/cmake/linux/libobs.pc.in || die
 
 	# -Werror=lto-type-mismatch
 	# https://bugs.gentoo.org/867250

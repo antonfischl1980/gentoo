@@ -10,7 +10,7 @@ HOMEPAGE="https://gnome.pages.gitlab.gnome.org/rygel/"
 
 LICENSE="LGPL-2.1+ CC-BY-SA-3.0"
 SLOT="0"
-KEYWORDS="amd64 ~arm64 ~x86"
+KEYWORDS="amd64 ~arm64 x86"
 IUSE="gtk gtk-doc +introspection +sqlite tracker test transcode"
 RESTRICT="!test? ( test )"
 
@@ -36,7 +36,7 @@ DEPEND="
 	x11-libs/gdk-pixbuf:2
 	>=sys-apps/util-linux-2.20
 	x11-misc/shared-mime-info
-	introspection? ( >=dev-libs/gobject-introspection-1.33.4:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	tracker? ( app-misc/tinysparql:3=[vala(+)] )
 	transcode? (
 		media-libs/gst-plugins-bad:1.0

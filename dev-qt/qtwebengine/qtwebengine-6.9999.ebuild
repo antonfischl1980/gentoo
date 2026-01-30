@@ -1,4 +1,4 @@
-# Copyright 2021-2025 Gentoo Authors
+# Copyright 2021-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -9,7 +9,7 @@ inherit prefix python-any-r1 qt6-build toolchain-funcs
 
 DESCRIPTION="Library for rendering dynamic web content in Qt6 C++ and QML applications"
 SRC_URI+="
-	https://dev.gentoo.org/~ionen/distfiles/${PN}-6.10-patchset-4.tar.xz
+	https://dev.gentoo.org/~ionen/distfiles/${PN}-6.11-patchset-1.tar.xz
 "
 
 if [[ ${QT6_BUILD_TYPE} == release ]]; then
@@ -34,7 +34,7 @@ RDEPEND="
 	dev-libs/libxslt
 	dev-libs/nspr
 	dev-libs/nss
-	~dev-qt/qtbase-${PV}:6[accessibility=,gui,opengl=,vulkan?,widgets?]
+	~dev-qt/qtbase-${PV}:6[accessibility=,gui,opengl=,ssl,vulkan?,widgets?]
 	~dev-qt/qtdeclarative-${PV}:6[widgets?]
 	~dev-qt/qtwebchannel-${PV}:6[qml?]
 	media-libs/fontconfig
@@ -50,8 +50,9 @@ RDEPEND="
 	media-libs/tiff:=
 	sys-apps/dbus
 	sys-apps/pciutils
-	sys-libs/zlib:=[minizip]
 	virtual/libudev:=
+	virtual/minizip:=
+	virtual/zlib:=
 	x11-libs/libX11
 	x11-libs/libXcomposite
 	x11-libs/libXdamage

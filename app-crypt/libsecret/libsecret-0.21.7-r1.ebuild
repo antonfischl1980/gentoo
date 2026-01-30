@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -29,14 +29,14 @@ DEPEND="
 	gnutls? ( >=net-libs/gnutls-3.8.2:0=[${MULTILIB_USEDEP}] )
 	pam? ( sys-libs/pam )
 	tpm? ( >=app-crypt/tpm2-tss-3.0.3:= )
-	introspection? ( >=dev-libs/gobject-introspection-1.54:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 "
 RDEPEND="${DEPEND}"
 PDEPEND="virtual/secret-service"
 BDEPEND="
 	app-text/docbook-xml-dtd:4.2
 	dev-libs/libxslt
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig

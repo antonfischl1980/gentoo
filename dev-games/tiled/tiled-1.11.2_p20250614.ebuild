@@ -14,7 +14,7 @@ S="${WORKDIR}/tiled-${COMMIT}"
 
 LICENSE="BSD BSD-2 GPL-2+"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 IUSE="minimal python"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
@@ -23,7 +23,7 @@ RDEPEND="
 	dev-qt/qtbase:6[X,dbus,gui,network,opengl,widgets]
 	dev-qt/qtdeclarative:6
 	dev-qt/qtsvg:6
-	sys-libs/zlib
+	virtual/zlib:=
 	python? ( ${PYTHON_DEPS} )
 "
 DEPEND="${RDEPEND}"

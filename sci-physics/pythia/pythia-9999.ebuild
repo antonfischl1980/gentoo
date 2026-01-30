@@ -6,7 +6,7 @@ EAPI=8
 PYTHON_COMPAT=( python3_{11..13} )
 inherit toolchain-funcs python-single-r1 optfeature
 
-MV=$(ver_cut 1-2)
+MY_PV=$(ver_cut 1-2)
 MY_P="${PN}${PV//./}"
 LHA_VER="6.2.1"
 
@@ -26,7 +26,7 @@ if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://gitlab.com/Pythia8/releases"
 else
-	SRC_URI="https://pythia.org/download/${PN}${MV//./}/${MY_P}.tgz
+	SRC_URI="https://pythia.org/download/${PN}${MY_PV//./}/${MY_P}.tgz
 	${SRC_URI}"
 	KEYWORDS="~amd64 ~x86"
 	S="${WORKDIR}/${MY_P}"
@@ -34,29 +34,23 @@ fi
 
 LICENSE="GPL-2"
 SLOT="8"
-IUSE="doc examples fastjet +hepmc3 hepmc2 lhapdf root test zlib python highfive mpich rivet" # evtgen mg5mes rivet powheg
+IUSE="doc examples fastjet +hepmc3 lhapdf root test zlib python highfive mpich rivet static-libs" # evtgen mg5mes rivet powheg
 RESTRICT="!test? ( test )"
-REQUIRED_USE="
-	?? ( hepmc3 hepmc2 )
-	python? ( ${PYTHON_REQUIRED_USE} )
-"
+REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 RDEPEND="
 	fastjet? ( sci-physics/fastjet )
 	hepmc3? ( sci-physics/hepmc:3= )
-	hepmc2? ( sci-physics/hepmc:2= )
 	lhapdf? ( sci-physics/lhapdf:= )
-	zlib? ( sys-libs/zlib )
+	zlib? ( virtual/zlib:= )
 	highfive? (
-		sci-libs/HighFive
+		sci-libs/highfive
 		sci-libs/hdf5[cxx]
 	)
-	rivet? (
-		sci-physics/rivet:*
-	)
+	rivet? ( >=sci-physics/rivet-4:* )
 	mpich? ( sys-cluster/mpich )
 	python? ( ${PYTHON_DEPS} )
-	"
+"
 DEPEND="${RDEPEND}"
 # ROOT is used only when building related tests
 BDEPEND="
@@ -136,7 +130,6 @@ src_configure() {
 		$(use_with python) \
 		$(use_with rivet) \
 		$(use_with mpich) \
-		$(use_with hepmc2) \
 		$(usex lhapdf "--with-lhapdf6
 			--with-lhapdf6-plugin=LHAPDF6.h
 			--with-lhapdf6-lib=${EPREFIX}/usr/$(get_libdir)" "") \
@@ -179,9 +172,11 @@ src_install() {
 	dobin bin/pythia8-config
 	doheader -r include/*
 	dolib.so lib/libpythia8.so
+	use static-libs && dolib.a lib/libpythia8.a
 	use lhapdf && dolib.so lib/libpythia8lhapdf6.so
 	insinto "${PYTHIADIR}"
 	doins -r share/Pythia8/tunes share/Pythia8/xmldoc share/Pythia8/pdfdata examples/Makefile.inc
+	dosym Pythia8 /usr/share/${PN}
 
 	newenvd - 99pythia8 <<- _EOF_
 		PYTHIA8DATA=${EPYTHIADIR}/xmldoc
@@ -194,12 +189,9 @@ src_install() {
 		dodoc -r share/Pythia8/htmldoc/.
 	fi
 	if use examples; then
-		# reuse system Makefile.inc
-		rm examples/Makefile.inc || die
 		sed -i "s|include Makefile.inc|include ${EPYTHIADIR}|" \
 			examples/Makefile || die
 
-		insinto /usr/share/${PN}
 		doins -r examples
 		docompress -x /usr/share/doc/${PF}/examples
 	fi

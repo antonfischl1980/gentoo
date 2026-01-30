@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -38,13 +38,13 @@ COMMON_DEPEND="
 	x11-libs/libXft
 	x11-libs/libXrender
 	>=x11-libs/pango-1.1.2
-	introspection? ( >=dev-libs/gobject-introspection-0.6.4:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	xmp? ( >=media-libs/exempi-1.99.5:2= )
 "
 
 BDEPEND="${COMMON_DEPEND}
 	>=dev-lang/perl-5:=
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	dev-util/gtk-doc
 	dev-build/gtk-doc-am

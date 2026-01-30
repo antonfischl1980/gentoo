@@ -1,8 +1,8 @@
-# Copyright 2020-2025 Gentoo Authors
+# Copyright 2020-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{11..13} )
 
 inherit linux-info meson python-any-r1 systemd tmpfiles
 
@@ -12,7 +12,7 @@ SRC_URI="https://github.com/${PN}/${PN}/releases/download/${PV}/${P}.tar.xz"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
+KEYWORDS="amd64 arm arm64 ~loong ~ppc64 ~riscv x86"
 IUSE="doc introspection policykit seccomp systemd test X"
 RESTRICT="!test? ( test )"
 
@@ -53,12 +53,12 @@ BDEPEND="
 	>=dev-build/automake-1.13.4
 	>=sys-devel/gettext-0.18.2
 	virtual/pkgconfig
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	dev-util/gtk-doc
 	app-alternatives/yacc
 	$(python_gen_any_dep 'dev-python/pyparsing[${PYTHON_USEDEP}]')
-	introspection? ( >=dev-libs/gobject-introspection-1.40 )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2 )
 	doc? (
 		app-text/xmlto
 		dev-libs/libxslt

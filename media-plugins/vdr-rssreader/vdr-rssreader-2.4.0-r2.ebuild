@@ -1,4 +1,4 @@
-# Copyright 2021-2024 Gentoo Authors
+# Copyright 2021-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -12,10 +12,10 @@ S="${WORKDIR}/vdr-plugin-rssreader-${PV}"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 
 DEPEND="
-	>media-video/vdr-2.4
+	>=media-video/vdr-2.4:=
 	dev-libs/expat
 	net-misc/curl"
 RDEPEND="${DEPEND}"

@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -13,7 +13,7 @@ S="${WORKDIR}/${PN}-${P}"
 
 LICENSE="POSTGRESQL GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 
 RDEPEND="
 	acct-user/pgagent
@@ -24,6 +24,7 @@ DEPEND="${RDEPEND}"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.2.3-cmake-4.patch
+	"${FILESDIR}"/${PN}-4.2.3-boost-1.89.patch
 )
 
 src_prepare() {

@@ -1,19 +1,19 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 # These don't necessarily have to align with the upstream release.
-BUILD_DEPS_COMMIT="6ad5cf841f592f95be47fb401cde02ae621acd0f"
+BUILD_DEPS_COMMIT="e87b7cec9c3a01cb671cdd8ba19fe443105412d4"
 DISPLAYDEV_COMMIT="v2025.612.225826"
-ENET_COMMIT="44c85e16279553d9c052e572bcbfcd745fb74abf"
-INPUTTINO_COMMIT="3a7a658782217d77ee1d1055c3930874cfd299aa"
-MOONLIGHT_COMMIT="58902e342f6d53d6783c99fe79a03168d46cd56f"
+ENET_COMMIT="115a10baa1d7f291ff5b870765610fd3b4a6e43c"
+INPUTTINO_COMMIT="504f0abc7da8ebc351f8300fb2ed98db5438ee48"
+MOONLIGHT_COMMIT="5f2280183cb62cba1052894d76e64e5f4153377d"
 NANORS_COMMIT="19f07b513e924e471cadd141943c1ec4adc8d0e0"
-TRAY_COMMIT="d45306e686c90a18f5792a1541783d7bc8555bc6"
+TRAY_COMMIT="0309a7cb84aad25079b60c40d1eae0bacd05b26d"
 SWS_COMMIT="187f798d54a9c6cee742f2eb2c54e9ba26f5a385"
-WLRP_COMMIT="ffb89ac790096f6e6272822c8d5df7d0cc6fcdfa"
-FFMPEG_VERSION="7.1.1"
+WLRP_COMMIT="a741f0ac5d655338a5100fc34bc8cec87d237346"
+FFMPEG_VERSION="8.0"
 
 # To make the assets tarball:
 # PV=
@@ -48,9 +48,6 @@ else
 	KEYWORDS="~amd64 ~arm64"
 	S="${WORKDIR}/Sunshine-${PV}"
 fi
-
-BOOST_VERSION="1.87.0"
-SRC_URI+="https://github.com/boostorg/boost/releases/download/boost-${BOOST_VERSION}/boost-${BOOST_VERSION}-cmake.tar.xz"
 
 inherit cmake fcaps flag-o-matic systemd toolchain-funcs udev xdg
 
@@ -132,6 +129,7 @@ REQUIRED_USE="
 "
 
 CDEPEND="
+	=dev-libs/boost-1.89*:=[nls]
 	dev-libs/libevdev
 	dev-libs/openssl:=
 	media-libs/opus
@@ -175,7 +173,7 @@ RDEPEND="
 DEPEND="
 	${CDEPEND}
 	dev-cpp/nlohmann_json
-	media-libs/amf-headers
+	>=media-libs/amf-headers-1.4.36-r1
 	<media-libs/nv-codec-headers-14
 	cuda? ( dev-util/nvidia-cuda-toolkit )
 	wayland? ( dev-libs/wayland-protocols )
@@ -191,6 +189,7 @@ BDEPEND="
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-2025.122.141614-nvcodec.patch
+	"${FILESDIR}"/${PN}-new-cuda.patch
 )
 
 # Make this mess a bit simpler.
@@ -201,7 +200,7 @@ export npm_config_audit=false
 export npm_config_color=false
 export npm_config_foreground_scripts=true
 export npm_config_loglevel=verbose
-export npm_config_optional=false
+export npm_config_optional=true # https://github.com/npm/cli/issues/4828
 export npm_config_progress=false
 export npm_config_save=false
 
@@ -229,7 +228,6 @@ src_unpack() {
 		cd "${S}" || die
 		npm install || die
 	else
-		unpack ${A//boost-${BOOST_VERSION}-cmake.tar.xz}
 		find moonlight-common-c-${MOONLIGHT_COMMIT} "${S}"/third-party \
 			build-deps-${BUILD_DEPS_COMMIT}/third-party/FFmpeg -mindepth 1 -type d -empty -delete || die
 		mv enet-${ENET_COMMIT} moonlight-common-c-${MOONLIGHT_COMMIT}/enet || die
@@ -259,13 +257,14 @@ src_configure() {
 		-DBASH_EXECUTABLE="${BROOT}"/bin/true
 		-DBUILD_ALL_SUNSHINE=no
 		-DBUILD_ALL=no
+		-DBUILD_FFMPEG=on
 		-DBUILD_FFMPEG_ALL_PATCHES=yes
 		-DBUILD_FFMPEG_AMF=no
 		-DBUILD_FFMPEG_CBS=yes
+		-DBUILD_FFMPEG_LIBVA=no
 		-DBUILD_FFMPEG_MF=no
 		-DBUILD_FFMPEG_NV_CODEC_HEADERS=no
 		-DBUILD_FFMPEG_SVT_AV1=no
-		-DBUILD_FFMPEG_VAAPI=no
 		-DBUILD_FFMPEG_X264=no
 		-DBUILD_FFMPEG_X265=no
 		-DBUILD_SHARED_LIBS=no
@@ -349,17 +348,12 @@ src_configure() {
 	echo ./configure "${myconf[@]}"
 	./configure "${myconf[@]}" || die
 
-	# Symlink Boost tarball for CMake to find instead of fetching live.
-	mkdir -p "${S}"/_deps/boost-subbuild/boost-populate-prefix/src || die
-	ln -s "${DISTDIR}/boost-${BOOST_VERSION}-cmake.tar.xz" "${S}"/_deps/boost-subbuild/boost-populate-prefix/src/ || die
-
 	local mycmakeargs=(
 		-DBUILD_SHARED_LIBS=no
-		-DBOOST_USE_STATIC=yes
+		-DBOOST_USE_STATIC=no
 		-DBUILD_DOCS=no
 		-DBUILD_TESTS=no
 		-DCCACHE_FOUND=no
-		-DCMAKE_DISABLE_FIND_PACKAGE_Boost=yes
 		-DFFMPEG_PLATFORM_LIBRARIES="$(usex svt-av1 SvtAv1Enc '');$(usex vaapi 'va;va-drm' '');$(usev x264);$(usev x265)"
 		-DFFMPEG_PREPARED_BINARIES="${S}"/third-party/build-deps/dist
 		-DSUNSHINE_ASSETS_DIR=share/${PN}

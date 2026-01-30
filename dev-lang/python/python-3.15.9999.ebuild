@@ -46,7 +46,7 @@ RDEPEND="
 	dev-libs/libffi:=
 	dev-libs/mpdecimal:=
 	dev-python/gentoo-common
-	>=sys-libs/zlib-1.1.3:=
+	>=virtual/zlib-1.1.3:=
 	virtual/libintl
 	gdbm? ( sys-libs/gdbm:=[berkdb] )
 	kernel_linux? ( sys-apps/util-linux:= )
@@ -85,6 +85,12 @@ BDEPEND="
 			llvm-core/clang:${LLVM_SLOT}
 			llvm-core/llvm:${LLVM_SLOT}
 		')
+	)
+	tail-call-interp? (
+		|| (
+			>=sys-devel/gcc-16:*
+			>=llvm-core/clang-19:*
+		)
 	)
 "
 PDEPEND="
@@ -128,6 +134,10 @@ pkg_setup() {
 				CONFIG_CHECK+="~${f} "
 			done
 			linux-info_pkg_setup
+		fi
+		if use tail-call-interp; then
+			tc-check-min_ver gcc 16
+			tc-check-min_ver clang 19
 		fi
 	fi
 }
@@ -348,6 +358,10 @@ src_configure() {
 			# Hangs (actually runs indefinitely executing itself w/ many cpython builds)
 			# bug #900429
 			-x test_tools
+
+			# Test terminates abruptly which corrupts written profile data
+			# bug #964023
+			-x test_pyrepl
 		)
 
 		if has_version "app-arch/rpm" ; then

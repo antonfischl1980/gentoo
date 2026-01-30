@@ -11,13 +11,13 @@ HOMEPAGE="https://llvm.org/"
 
 LICENSE="Apache-2.0-with-LLVM-exceptions UoI-NCSA"
 SLOT="${LLVM_MAJOR}/${LLVM_SOABI}"
-KEYWORDS="amd64 arm arm64 ~ppc ppc64 ~riscv x86 ~arm64-macos"
+KEYWORDS="amd64 arm arm64 ppc ppc64 ~riscv x86 ~arm64-macos"
 IUSE="debug test zstd"
 RESTRICT="!test? ( test )"
 
 DEPEND="
 	~llvm-core/llvm-${PV}[zstd=]
-	sys-libs/zlib:=
+	virtual/zlib:=
 	zstd? ( app-arch/zstd:= )
 "
 RDEPEND="
@@ -36,7 +36,7 @@ PDEPEND="
 
 LLVM_COMPONENTS=( lld cmake libunwind/include/mach-o )
 LLVM_TEST_COMPONENTS=( llvm/utils third-party )
-LLVM_PATCHSET=${PV}-r1
+LLVM_PATCHSET=${PV}-r6
 llvm.org_set_globals
 
 python_check_deps() {

@@ -32,7 +32,7 @@ DEPEND="
 	net-libs/libpcap
 	>=sys-fs/fuse-3.2.0:3=
 	>=sys-libs/binutils-libs-2.42:=
-	sys-libs/zlib
+	virtual/zlib:=
 "
 RDEPEND="
 	${DEPEND}
@@ -86,6 +86,7 @@ pkg_pretend() {
 	CONFIG_CHECK+=" ~UPROBES ~UPROBE_EVENTS"
 	CONFIG_CHECK+=" ~FTRACE ~FTRACE_SYSCALLS ~DYNAMIC_FTRACE ~FUNCTION_TRACER"
 	CONFIG_CHECK+=" ~FPROBE"
+	CONFIG_CHECK+=" ~BPF_KPROBE_OVERRIDE ~FUNCTION_ERROR_INJECTION"
 	# DTrace can fallback to kprobes for fbt but people often want them off
 	# for security and newer kernels work fine with BPF for that, so
 	# let's omit it. kprobes are slower and scale poorly.
@@ -163,7 +164,8 @@ src_test() {
 src_install() {
 	emake DESTDIR="${D}" -j1 install $(usev test-install install-test)
 
-	# Stripping the BPF libs breaks them
+	# We want to strip neither the BPF libraries nor libdtrace.so itself
+	# as probes attach to some symbols that would get removed otherwise.
 	dostrip -x "/usr/$(get_libdir)"
 
 	# It's a binary (TODO: move it?)

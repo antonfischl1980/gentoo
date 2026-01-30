@@ -524,20 +524,16 @@ x86		default/linux/x86/23.0/i486/split-usr/musl/selinux		exp
 # These are Gentoo Prefix profiles, maintained by the Prefix team
 # @MAINTAINER: prefix@gentoo.org
 
-# Linux Profiles
-amd64-linux	prefix/linux/amd64						exp
-arm-linux	prefix/linux/arm						exp
-ppc64-linux	prefix/linux/ppc64						exp
-ppc64-linux	prefix/linux/ppc64le						exp
-riscv-linux	prefix/linux/riscv						exp
-x86-linux	prefix/linux/x86						exp
-
-# Linux Standalone Profiles
-# ??
+# Linux Profiles (non-RAP)
+# commented out for now, for I don't want them to show up to users
+#amd64		prefix/linux/amd64						exp
+#arm		prefix/linux/arm						exp
+#ppc64		prefix/linux/ppc64						exp
+#ppc64		prefix/linux/ppc64le						exp
+#riscv		prefix/linux/riscv						exp
+#x86		prefix/linux/x86						exp
 
 # macOS Profiles
-ppc-macos	prefix/darwin/macos/10.5/ppc/gcc				exp
-x86-macos	prefix/darwin/macos/10.5/x86/gcc				exp
 x64-macos	prefix/darwin/macos/10.11/x64					exp
 x64-macos	prefix/darwin/macos/10.13/x64					exp
 x64-macos	prefix/darwin/macos/10.13/x64/gcc				exp
@@ -552,6 +548,7 @@ x64-macos	prefix/darwin/macos/12.0/x64/gcc				exp
 x64-macos	prefix/darwin/macos/13.0/x64/gcc				exp
 x64-macos	prefix/darwin/macos/14.0/x64/gcc				exp
 x64-macos	prefix/darwin/macos/15.0/x64/gcc				exp
+x64-macos	prefix/darwin/macos/26.0/x64/gcc				exp
 arm64-macos	prefix/darwin/macos/11.0/arm64					exp
 arm64-macos	prefix/darwin/macos/11.0/arm64/gcc				exp
 arm64-macos	prefix/darwin/macos/12.0/arm64					exp
@@ -559,6 +556,7 @@ arm64-macos	prefix/darwin/macos/12.0/arm64/gcc				exp
 arm64-macos	prefix/darwin/macos/13.0/arm64/gcc				exp
 arm64-macos	prefix/darwin/macos/14.0/arm64/gcc				exp
 arm64-macos	prefix/darwin/macos/15.0/arm64/gcc				exp
+arm64-macos	prefix/darwin/macos/26.0/arm64/gcc				exp
 
 # Solaris Profiles
 x64-solaris	prefix/sunos/solaris/5.11/x64					exp

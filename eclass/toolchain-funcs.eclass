@@ -474,7 +474,7 @@ tc-ld-is-bfd() {
 	EOF
 	out=$($(tc-getCC "$@") ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} -Wl,--version "${base}.c" -o "${base}" 2>&1)
 	rm -f "${base}"*
-	if [[ ! ${out} =~ .*^"GNU ld".* ]] ; then
+	if [[ ! ${out} =~ (^|$'\n')"GNU ld".* ]] ; then
 		return 1
 	fi
 
@@ -659,11 +659,11 @@ _tc-has-openmp() {
 # build-time, e.g.
 # @CODE
 # pkg_pretend() {
-#	[[ ${MERGE_TYPE} != binary ]] && tc-check-min_ver gcc 13.2.0
+#	[[ ${MERGE_TYPE} != binary ]] && tc-check-min_ver gcc 13.2
 # }
 #
 # pkg_setup() {
-#	[[ ${MERGE_TYPE} != binary ]] && tc-check-min_ver gcc 13.2.0
+#	[[ ${MERGE_TYPE} != binary ]] && tc-check-min_ver gcc 13.2
 # }
 # @CODE
 tc-check-min_ver() {

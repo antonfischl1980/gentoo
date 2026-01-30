@@ -124,7 +124,7 @@ COMMON_SNAPSHOT_DEPEND="
 	>=media-libs/libwebp-0.4.0:=
 	media-libs/mesa:=[gbm(+)]
 	>=media-libs/openh264-1.6.0:=
-	sys-libs/zlib:=
+	virtual/zlib:=
 	!headless? (
 		dev-libs/glib:2
 		>=media-libs/alsa-lib-1.0.19:=
@@ -154,7 +154,7 @@ COMMON_DEPEND="
 	net-misc/curl[ssl]
 	sys-apps/dbus:=
 	media-libs/flac:=
-	sys-libs/zlib:=[minizip]
+	virtual/minizip:=
 	!headless? (
 		>=app-accessibility/at-spi2-core-2.46.0:2
 		media-libs/mesa:=[X?,wayland?]
@@ -500,6 +500,13 @@ src_prepare() {
 			sed -i 's/adler2/adler/' build/rust/std/BUILD.gn ||
 				die "Failed to tell GN that we have adler and not adler2"
 		fi
+
+		# chromium@0420449584e2afb7473393f536379efe194ba23c
+		# this crate is not included in the latest versions of Rust,
+		# and apparently has been unnecessary in Chromium for a long time.
+				sed -i '/unicode_width/d' build/rust/std/BUILD.gn ||
+			die "Failed to remove unicode_width from build/rust/std/BUILD.gn"
+
 	fi
 
 	default

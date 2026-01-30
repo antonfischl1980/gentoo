@@ -1,4 +1,4 @@
-# Copyright 2022-2025 Gentoo Authors
+# Copyright 2022-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -22,7 +22,7 @@ S="${WORKDIR}/${PN}-v${PV}"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~sparc ~x86"
 IUSE="+archive +curl +libpkgconf test"
 
 DEPEND="
@@ -32,7 +32,10 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 BDEPEND="
-	test? ( dev-util/gdbus-codegen )
+	test? (
+		>=dev-util/gdbus-codegen-2.80.5-r1
+		dev-util/glib-utils
+	)
 "
 RESTRICT="!test? ( test )"
 

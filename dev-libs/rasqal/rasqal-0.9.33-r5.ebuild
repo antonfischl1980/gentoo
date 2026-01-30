@@ -11,7 +11,7 @@ SRC_URI="https://download.librdf.org/source/${P}.tar.gz"
 
 LICENSE="Apache-2.0 GPL-2 LGPL-2.1"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86"
 IUSE="+crypt gmp +mhash pcre static-libs test xml"
 RESTRICT="!test? ( test )"
 
@@ -24,7 +24,7 @@ RDEPEND="
 	!gmp? ( dev-libs/mpfr:= )
 	gmp? ( dev-libs/gmp:= )
 	kernel_linux? ( >=sys-apps/util-linux-2.19 )
-	pcre? ( dev-libs/libpcre2 )
+	pcre? ( dev-libs/libpcre2:= )
 	xml? ( dev-libs/libxml2:= )
 "
 DEPEND="${RDEPEND}"
@@ -58,7 +58,6 @@ src_configure() {
 	local myeconfargs=(
 		--with-decimal=$(usex gmp gmp mpfr)
 		--with-uuid-library=$(usex kernel_linux libuuid internal)
-		$(use_enable pcre)
 		--with-regex-library=$(usex pcre pcre2 posix)
 		$(use_enable static-libs static)
 		$(use_enable xml xml2)

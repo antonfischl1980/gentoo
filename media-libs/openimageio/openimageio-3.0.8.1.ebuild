@@ -48,7 +48,7 @@ S="${WORKDIR}/OpenImageIO-${PV}"
 
 LICENSE="Apache-2.0"
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~riscv"
+KEYWORDS="amd64 ~arm ~arm64 ~ppc64 ~riscv"
 
 X86_CPU_FEATURES=(
 	aes:aes
@@ -93,7 +93,7 @@ RDEPEND="
 	media-libs/opencolorio:=
 	media-libs/openexr:=
 	media-libs/tiff:=
-	sys-libs/zlib:=
+	virtual/zlib:=
 	dicom? ( sci-libs/dcmtk )
 	ffmpeg? ( media-video/ffmpeg:= )
 	fits? ( sci-libs/cfitsio:= )

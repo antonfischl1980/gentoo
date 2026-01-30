@@ -3,7 +3,7 @@
 
 EAPI="8"
 
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{11..13} )
 inherit cmake python-single-r1 xdg
 
 DESCRIPTION="Advanced IRC Client"
@@ -15,7 +15,7 @@ if [[ ${PV} == *9999* ]]; then
 else
 	SRC_URI="https://github.com/kvirc/KVIrc/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
 	S="${WORKDIR}/KVIrc-${PV}"
-	KEYWORDS="~amd64 ~ppc ~ppc64 ~riscv ~x86"
+	KEYWORDS="amd64 ~ppc ~ppc64 ~riscv ~x86"
 fi
 
 LICENSE="GPL-2+"
@@ -33,7 +33,7 @@ DEPEND="
 	dev-qt/qtbase:6[concurrent,gui,network,sql,widgets,xml]
 	dev-qt/qtmultimedia:6
 	dev-qt/qt5compat:6
-	sys-libs/zlib:0=
+	virtual/zlib:=
 	x11-libs/libX11
 	audiofile? ( media-libs/audiofile )
 	dbus? ( dev-qt/qtbase:6[dbus] )

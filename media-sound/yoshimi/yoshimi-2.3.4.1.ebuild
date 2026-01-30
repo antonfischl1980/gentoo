@@ -12,7 +12,7 @@ S="${WORKDIR}/${P}/src"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE="+lv2"
 
 BDEPEND="virtual/pkgconfig"
@@ -24,7 +24,7 @@ DEPEND="
 	sci-libs/fftw:3.0=
 	sys-libs/ncurses:0=
 	sys-libs/readline:0=
-	sys-libs/zlib
+	virtual/zlib:=
 	virtual/jack
 	x11-libs/cairo[X]
 	x11-libs/fltk:1=[X(+),opengl]

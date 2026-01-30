@@ -14,7 +14,7 @@ S="${WORKDIR}/${PN}-${PV/_/-}"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ~mips ppc ppc64 ~riscv ~s390 ~sparc x86"
 IUSE="autoipd bookmarks +dbus doc gdbm gtk howl-compat +introspection mdnsresponder-compat nls python qt6 selinux systemd test"
 
 REQUIRED_USE="
@@ -35,7 +35,7 @@ DEPEND="
 	dbus? ( sys-apps/dbus[${MULTILIB_USEDEP}] )
 	gdbm? ( sys-libs/gdbm:=[${MULTILIB_USEDEP}] )
 	gtk?  ( x11-libs/gtk+:3[${MULTILIB_USEDEP}] )
-	introspection? ( dev-libs/gobject-introspection:= )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	kernel_linux? ( sys-libs/libcap )
 	python? (
 		${PYTHON_DEPS}

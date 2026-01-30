@@ -14,7 +14,7 @@ SRC_URI="
 
 LICENSE="|| ( LGPL-3 GPL-2+ ) AGPL-3+ BSD GPL-3+ MIT"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 IUSE="libmpv mysql qtmultimedia +sqlite webengine"
 REQUIRED_USE="
 	|| ( mysql sqlite )
@@ -30,7 +30,7 @@ DEPEND="
 	dev-qt/qtmultimedia:6[gstreamer]
 	dev-qt/qt5compat:6
 	media-libs/libglvnd
-	sys-libs/zlib:=
+	virtual/zlib:=
 	libmpv? (
 		dev-qt/qtbase:6[opengl]
 		media-video/mpv:=

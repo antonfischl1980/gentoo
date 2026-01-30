@@ -1,9 +1,6 @@
 # Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-# Note: xemacs currently does not work with position independent code
-# so the build forces the use of the -no-pie option
-
 EAPI=8
 
 inherit flag-o-matic xdg-utils desktop autotools
@@ -21,10 +18,11 @@ IUSE="alsa debug gif gpm pop postgres ldap xface nas X jpeg tiff png motif xft x
 
 X_DEPEND="x11-libs/libXt x11-libs/libXmu x11-libs/libXext x11-misc/xbitmaps"
 
+# If sys-libs/db:5.3 is removed from tree 4.8 can be used.
 RDEPEND="
-	berkdb? ( >=sys-libs/db-4:= )
+	berkdb? ( sys-libs/db:5.3= )
 	gdbm? ( >=sys-libs/gdbm-1.8.3:=[berkdb(+)] )
-	>=sys-libs/zlib-1.1.4
+	>=virtual/zlib-1.1.4:=
 	>=dev-libs/openssl-0.9.6:0=
 	>=media-libs/audiofile-0.2.3
 	gpm? ( >=sys-libs/gpm-1.19.6 )
@@ -64,6 +62,7 @@ src_prepare() {
 	use neXt && cp "${WORKDIR}"/NeXT.XEmacs/xemacs-icons/* "${S}"/etc/toolbar/
 	find "${S}"/lisp -name '*.elc' -exec rm {} \; || die
 	eapply "${FILESDIR}/${PN}-21.5.35-unknown-command-test.patch"
+	eapply "${FILESDIR}/${PN}-21.5.36-berkdb-5.3.patch"
 
 	eapply_user
 
@@ -79,10 +78,6 @@ src_prepare() {
 
 src_configure() {
 	local myconf=""
-
-	# bug #639642
-	test-flags -no-pie >/dev/null && append-flags -no-pie
-	filter-flags -pie
 
 	if use X; then
 
@@ -147,9 +142,9 @@ src_configure() {
 	myconf="${myconf} --with-sound=${soundconf}"
 
 	if use gdbm || use berkdb ; then
-		use gdbm   && mydb="gdbm"
-		use berkdb && mydb="${mydb},berkdb"
-
+		local mydb="nodbm"
+		use gdbm   && mydb="${mydb},gdbm"   || mydb="${mydb},nogdbm"
+		use berkdb && mydb="${mydb},berkdb" || mydb="${mydb},noberkdb"
 		myconf="${myconf} --with-database=${mydb}"
 	else
 		myconf="${myconf} --without-database"
@@ -185,7 +180,7 @@ src_configure() {
 }
 
 src_compile() {
-	# bug: #959756
+	# bug #959756
 	local -x CCACHE_DISABLE=1
 	emake EMACSLOADPATH="${S}"/lisp
 }

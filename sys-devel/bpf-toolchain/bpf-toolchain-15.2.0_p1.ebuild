@@ -40,14 +40,14 @@ LICENSE="
 	LGPL-3+ || ( GPL-3+ libgcc libstdc++ gcc-runtime-library-exception-3.1 )
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
+KEYWORDS="amd64 arm arm64 ~hppa ~loong ~mips ppc ppc64 ~riscv ~s390 ~sparc x86"
 IUSE="+bin-symlinks custom-cflags +strip"
 
 RDEPEND="
 	dev-libs/gmp:=
 	dev-libs/mpc:=
 	dev-libs/mpfr:=
-	sys-libs/zlib:=
+	virtual/zlib:=
 	virtual/libiconv
 	bin-symlinks? (
 		!cross-bpf-unknown-none/binutils

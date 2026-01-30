@@ -1,4 +1,4 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -73,7 +73,7 @@ else
 		https://github.com/opencv/opencv/commit/54b03cc2f84cfe83222c59b747e17cb378a9744c.patch
 		-> ${P}-fix_videowriter_raw_return_code.patch
 	"
-	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
+	KEYWORDS="amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
 fi
 
 LICENSE="Apache-2.0"
@@ -198,7 +198,7 @@ RESTRICT="!test? ( test )"
 # dev-libs/flatbuffers is header only, but we still want to rebuild on sub-slot changes
 COMMON_DEPEND="
 	dev-libs/protobuf:=[protoc(+),protobuf(+),${MULTILIB_USEDEP}]
-	sys-libs/zlib[${MULTILIB_USEDEP}]
+	virtual/zlib:=[${MULTILIB_USEDEP}]
 	avif? ( media-libs/libavif:=[${MULTILIB_USEDEP}] )
 	cuda? ( dev-util/nvidia-cuda-toolkit:= )
 	cudnn? (
@@ -281,7 +281,7 @@ COMMON_DEPEND="
 		dev-qt/qt5compat:6
 		dev-qt/qtbase:6[gui,widgets,concurrent,opengl?]
 	)
-	quirc? ( media-libs/quirc )
+	quirc? ( media-libs/quirc:=[${MULTILIB_USEDEP}] )
 	tbb? ( >=dev-cpp/tbb-2022.1.0:=[${MULTILIB_USEDEP}] )
 	tesseract? ( app-text/tesseract[${MULTILIB_USEDEP}] )
 	tiff? ( media-libs/tiff:=[${MULTILIB_USEDEP}] )
@@ -343,6 +343,7 @@ RDEPEND="
 unset COMMON_DEPEND
 
 BDEPEND="
+	dev-util/patchelf
 	virtual/pkgconfig
 	cuda? ( dev-util/nvidia-cuda-toolkit:= )
 	doc? (
