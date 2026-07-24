@@ -17,7 +17,7 @@ HOMEPAGE="
 
 LICENSE="BSD MIT ISC"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~arm"
 
 RDEPEND="
 	!<dev-python/jupyterlab-4.6.0
