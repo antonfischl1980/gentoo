@@ -6,6 +6,6 @@
 		<email>flow@gentoo.org</email>
 	</maintainer>
 	<upstream>
-		<remote-id type="github">EvaSDK/offlineimap3</remote-id>
+		<remote-id type="github">OfflineIMAP/offlineimap3</remote-id>
 	</upstream>
 </pkgmetadata>
